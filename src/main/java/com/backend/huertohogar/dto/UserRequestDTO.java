@@ -1,63 +1,20 @@
-package com.backend.huertohogar.model;
+package com.backend.huertohogar.dto;
 
-import jakarta.persistence.*;
-
-import java.time.LocalDateTime;
-
-
-@Entity
-@Table(name = "usuarios")
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    @Column(unique = true, nullable = false)
+public class UserRequestDTO {
     private String email;
-
-    @Column(nullable = false)
     private String password;
-
-    @Column(nullable = false)
     private String nombre;
-
-    @Column(nullable = false)
     private String apellido;
-
-    @Column(nullable = false)
     private String run;
-
-    @Column(nullable = true)
     private String telefono;
-
-    @Column(nullable = false)
     private String region;
-
-    @Column(nullable = false)
     private String comuna;
-
-    @Column(nullable = false)
     private String direccion;
-
-    @Column(nullable = true)
     private String comentario;
 
-    @Column(nullable = false, name = "fecha_registro")
-    private LocalDateTime fechaRegistro;
+    private Integer role_id;
 
-    @ManyToOne
-    @JoinColumn(name = "role_id", nullable = false)
-    private Rol rol;
-
-    public User() {}
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
+    public UserRequestDTO() {
     }
 
     public String getEmail() {
@@ -140,19 +97,11 @@ public class User {
         this.comentario = comentario;
     }
 
-    public LocalDateTime getFechaRegistro() {
-        return fechaRegistro;
+    public Integer getRole_id() {
+        return role_id;
     }
 
-    public void setFechaRegistro(LocalDateTime fechaRegistro) {
-        this.fechaRegistro = fechaRegistro;
-    }
-
-    public Rol getRol() {
-        return rol;
-    }
-
-    public void setRol(Rol rol) {
-        this.rol = rol;
+    public void setRole_id(Integer role_id) {
+        this.role_id = role_id;
     }
 }

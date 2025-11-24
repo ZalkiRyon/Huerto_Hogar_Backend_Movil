@@ -1,56 +1,43 @@
-package com.backend.huertohogar.model;
+package com.backend.huertohogar.dto;
 
-import jakarta.persistence.*;
+import com.backend.huertohogar.model.User;
 
 import java.time.LocalDateTime;
 
-
-@Entity
-@Table(name = "usuarios")
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class UserResponseDTO {
     private Integer id;
-
-    @Column(unique = true, nullable = false)
     private String email;
-
-    @Column(nullable = false)
     private String password;
-
-    @Column(nullable = false)
     private String nombre;
-
-    @Column(nullable = false)
     private String apellido;
-
-    @Column(nullable = false)
     private String run;
-
-    @Column(nullable = true)
     private String telefono;
-
-    @Column(nullable = false)
     private String region;
-
-    @Column(nullable = false)
     private String comuna;
-
-    @Column(nullable = false)
     private String direccion;
-
-    @Column(nullable = true)
     private String comentario;
-
-    @Column(nullable = false, name = "fecha_registro")
     private LocalDateTime fechaRegistro;
 
-    @ManyToOne
-    @JoinColumn(name = "role_id", nullable = false)
-    private Rol rol;
+    private String roleNombre;
 
-    public User() {}
+    public UserResponseDTO(User user) {
+        this.id = user.getId();
+        this.email = user.getEmail();
+        this.password = user.getPassword();
+        this.nombre = user.getNombre();
+        this.apellido = user.getApellido();
+        this.run = user.getRun();
+        this.telefono = user.getTelefono();
+        this.region = user.getRegion();
+        this.comuna = user.getComuna();
+        this.direccion = user.getDireccion();
+        this.comentario = user.getComentario();
+        this.fechaRegistro = user.getFechaRegistro();
+
+        if (user.getRol() != null) {
+            this.roleNombre = user.getRol().getNombre();
+        }
+    }
 
     public Integer getId() {
         return id;
@@ -148,11 +135,11 @@ public class User {
         this.fechaRegistro = fechaRegistro;
     }
 
-    public Rol getRol() {
-        return rol;
+    public String getRoleNombre() {
+        return roleNombre;
     }
 
-    public void setRol(Rol rol) {
-        this.rol = rol;
+    public void setRoleNombre(String roleNombre) {
+        this.roleNombre = roleNombre;
     }
 }
