@@ -1,6 +1,6 @@
 package com.backend.huertohogar.dto;
 
-public class ProductoDTO {
+public class ProductoRequestDTO {
     private String nombre;
     private String categoria;
     private Integer precio;
@@ -8,7 +8,7 @@ public class ProductoDTO {
     private String descripcion;
     private String imagen;
 
-    public ProductoDTO() {
+    public ProductoRequestDTO() {
     }
 
     public String getNombre() {

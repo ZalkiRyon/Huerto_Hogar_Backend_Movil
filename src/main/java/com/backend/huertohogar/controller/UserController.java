@@ -1,6 +1,5 @@
 package com.backend.huertohogar.controller;
 
-
 import com.backend.huertohogar.dto.UserRequestDTO;
 import com.backend.huertohogar.dto.UserResponseDTO;
 import com.backend.huertohogar.service.UserService;
@@ -13,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/usuarios")
-@CrossOrigin(origins = "http://localhost:3306")
+@CrossOrigin(origins = "*")
 public class UserController {
 
     private final UserService userService;

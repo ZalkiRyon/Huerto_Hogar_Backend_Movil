@@ -1,67 +1,19 @@
 package com.backend.huertohogar.service;
 
-import com.backend.huertohogar.model.Categoria;
-import com.backend.huertohogar.model.Producto;
-import com.backend.huertohogar.repository.CategoriaRepository;
-import com.backend.huertohogar.repository.ProductoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.backend.huertohogar.dto.ProductoRequestDTO;
+import com.backend.huertohogar.dto.ProductoResponseDTO;
 
 import java.util.List;
 import java.util.Optional;
 
-@Service
-public class ProductoService {
+public interface ProductoService {
+    List<ProductoResponseDTO> getAllProductos();
 
-    @Autowired
-    private ProductoRepository productoRepository;
+    Optional<ProductoResponseDTO> getProductoById(Integer id);
 
-    @Autowired
-    private CategoriaRepository categoriaRepository;
+    ProductoResponseDTO saveProducto(ProductoRequestDTO productoDTO);
 
-    public List<Producto> getAllProductos() {
-        return productoRepository.findAll();
-    }
+    void deleteProducto(Integer id);
 
-    public Optional<Producto> getProductoById(Integer id) {
-        return productoRepository.findById(id);
-    }
-
-    public Producto saveProducto(Producto producto, String nombreCategoria) {
-        if (nombreCategoria != null && !nombreCategoria.isEmpty()) {
-            Optional<Categoria> categoriaOpt = categoriaRepository.findByNombre(nombreCategoria);
-            if (categoriaOpt.isPresent()) {
-                producto.setCategoria(categoriaOpt.get());
-            } else {
-                throw new RuntimeException("Categoria no encontrada: " + nombreCategoria);
-            }
-        }
-        return productoRepository.save(producto);
-    }
-
-    public void deleteProducto(Integer id) {
-        productoRepository.deleteById(id);
-    }
-
-    public Producto updateProducto(Integer id, Producto productoDetails, String nombreCategoria) {
-        Producto producto = productoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + id));
-
-        producto.setNombre(productoDetails.getNombre());
-        producto.setPrecio(productoDetails.getPrecio());
-        producto.setStock(productoDetails.getStock());
-        producto.setDescripcion(productoDetails.getDescripcion());
-        producto.setImagen(productoDetails.getImagen());
-
-        if (nombreCategoria != null && !nombreCategoria.isEmpty()) {
-            Optional<Categoria> categoriaOpt = categoriaRepository.findByNombre(nombreCategoria);
-            if (categoriaOpt.isPresent()) {
-                producto.setCategoria(categoriaOpt.get());
-            } else {
-                throw new RuntimeException("Categoria no encontrada: " + nombreCategoria);
-            }
-        }
-
-        return productoRepository.save(producto);
-    }
+    ProductoResponseDTO updateProducto(Integer id, ProductoRequestDTO productoDTO);
 }

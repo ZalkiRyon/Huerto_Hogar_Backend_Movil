@@ -1,9 +1,10 @@
 package com.backend.huertohogar.controller;
 
-import com.backend.huertohogar.dto.ProductoDTO;
-import com.backend.huertohogar.model.Producto;
+import com.backend.huertohogar.dto.ProductoRequestDTO;
+import com.backend.huertohogar.dto.ProductoResponseDTO;
 import com.backend.huertohogar.service.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,53 +15,48 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class ProductoController {
 
+    private final ProductoService productoService;
+
     @Autowired
-    private ProductoService productoService;
+    public ProductoController(ProductoService productoService) {
+        this.productoService = productoService;
+    }
 
     @GetMapping
-    public List<Producto> getAllProductos() {
-        return productoService.getAllProductos();
+    public ResponseEntity<List<ProductoResponseDTO>> getAllProductos() {
+        List<ProductoResponseDTO> productos = productoService.getAllProductos();
+        return new ResponseEntity<>(productos, HttpStatus.OK);
+        // code 200
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> getProductoById(@PathVariable Integer id) {
+    public ResponseEntity<ProductoResponseDTO> getProductoById(@PathVariable Integer id) {
         return productoService.getProductoById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(productoDTO -> new ResponseEntity<>(productoDTO, HttpStatus.OK))
+                // code 200
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        // code 404
     }
 
     @PostMapping
-    public Producto createProducto(@RequestBody ProductoDTO productoDTO) {
-        Producto producto = new Producto();
-        producto.setNombre(productoDTO.getNombre());
-        producto.setPrecio(productoDTO.getPrecio());
-        producto.setStock(productoDTO.getStock());
-        producto.setDescripcion(productoDTO.getDescripcion());
-        producto.setImagen(productoDTO.getImagen());
-
-        return productoService.saveProducto(producto, productoDTO.getCategoria());
+    public ResponseEntity<ProductoResponseDTO> createProducto(@RequestBody ProductoRequestDTO productoDTO) {
+        ProductoResponseDTO newProductoResponse = productoService.saveProducto(productoDTO);
+        return new ResponseEntity<>(newProductoResponse, HttpStatus.CREATED);
+        // code 201
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> updateProducto(@PathVariable Integer id, @RequestBody ProductoDTO productoDTO) {
-        Producto producto = new Producto();
-        producto.setNombre(productoDTO.getNombre());
-        producto.setPrecio(productoDTO.getPrecio());
-        producto.setStock(productoDTO.getStock());
-        producto.setDescripcion(productoDTO.getDescripcion());
-        producto.setImagen(productoDTO.getImagen());
-
-        try {
-            Producto updatedProducto = productoService.updateProducto(id, producto, productoDTO.getCategoria());
-            return ResponseEntity.ok(updatedProducto);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<ProductoResponseDTO> updateProducto(@PathVariable Integer id,
+            @RequestBody ProductoRequestDTO productoDTO) {
+        ProductoResponseDTO updatedProductoResponse = productoService.updateProducto(id, productoDTO);
+        return new ResponseEntity<>(updatedProductoResponse, HttpStatus.OK);
+        // code 200
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProducto(@PathVariable Integer id) {
         productoService.deleteProducto(id);
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        // code 204
     }
 }
