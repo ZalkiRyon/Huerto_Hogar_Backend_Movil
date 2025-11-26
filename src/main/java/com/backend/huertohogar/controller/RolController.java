@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/roles")
-@CrossOrigin(origins = "http://localhost:3306")
+@CrossOrigin(origins = "*")
 public class RolController {
     private final RolService rolService;
 
