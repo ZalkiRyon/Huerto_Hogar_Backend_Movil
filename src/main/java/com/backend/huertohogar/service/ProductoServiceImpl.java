@@ -29,18 +29,30 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     public List<ProductoResponseDTO> getAllProductos() {
+        // Filtrar solo los activos si se desea, o todos.
+        // Para este caso, mostraremos todos pero el borrado es lógico.
+        // Si se quisiera solo activos: return productoRepository.findByActivoTrue()...
         return productoRepository.findAll().stream()
+                .filter(p -> p.getActivo() == null || p.getActivo()) // Asumiendo null como activo por compatibilidad
                 .map(ProductoResponseDTO::new)
                 .collect(Collectors.toList());
     }
 
     @Override
     public Optional<ProductoResponseDTO> getProductoById(Integer id) {
-        return productoRepository.findById(id).map(ProductoResponseDTO::new);
+        return productoRepository.findById(id)
+                .filter(p -> p.getActivo() == null || p.getActivo())
+                .map(ProductoResponseDTO::new);
     }
 
     @Override
     public ProductoResponseDTO saveProducto(ProductoRequestDTO productoDTO) {
+        // Validación de duplicados
+        if (productoRepository.existsByNombre(productoDTO.getNombre())) {
+            throw new ValidationException("Ya existe un producto con el nombre: " + productoDTO.getNombre());
+        }
+
+
         // Validaciones
         if (productoDTO.getNombre() == null || productoDTO.getNombre().trim().isEmpty()) {
             throw new ValidationException("El nombre del producto es obligatorio y no puede estar vacío");
@@ -68,18 +80,10 @@ public class ProductoServiceImpl implements ProductoService {
         producto.setStock(productoDTO.getStock());
         producto.setDescripcion(productoDTO.getDescripcion());
         producto.setImagen(productoDTO.getImagen());
+        producto.setActivo(true);
 
         Producto savedProducto = productoRepository.save(producto);
         return new ProductoResponseDTO(savedProducto);
-    }
-
-    @Override
-    public void deleteProducto(Integer id) {
-        if (productoRepository.findById(id).isPresent()) {
-            productoRepository.deleteById(id);
-        } else {
-            throw new ResourceNotFoundException("No se puede eliminar. Producto no encontrado con ID: " + id);
-        }
     }
 
     @Override
@@ -87,6 +91,10 @@ public class ProductoServiceImpl implements ProductoService {
         Producto existingProducto = productoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con ID: " + id));
 
+        // Validación de duplicados (excluyendo el actual)
+        if (productoRepository.existsByNombreAndIdNot(productoDTO.getNombre(), id)) {
+            throw new ValidationException("Ya existe otro producto con el nombre: " + productoDTO.getNombre());
+        }
         // Validaciones
         if (productoDTO.getNombre() == null || productoDTO.getNombre().trim().isEmpty()) {
             throw new ValidationException("El nombre del producto es obligatorio y no puede estar vacío");
@@ -113,6 +121,7 @@ public class ProductoServiceImpl implements ProductoService {
         existingProducto.setStock(productoDTO.getStock());
         existingProducto.setDescripcion(productoDTO.getDescripcion());
         existingProducto.setImagen(productoDTO.getImagen());
+        // No cambiamos el estado activo aquí, eso es en delete o un endpoint específico
 
         Producto updatedProducto = productoRepository.save(existingProducto);
         return new ProductoResponseDTO(updatedProducto);
@@ -123,4 +132,15 @@ public class ProductoServiceImpl implements ProductoService {
         return productoRepository.findById(id)
                 .map(Producto::getNombre);
     }
+
+    @Override
+    public void deleteProducto(Integer id) {
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con ID: " + id));
+
+        // Borrado lógico
+        producto.setActivo(false);
+        productoRepository.save(producto);
+    }
 }
+
