@@ -110,4 +110,43 @@ public class OrdenServiceImpl implements OrdenService {
     public Optional<OrdenResponseDTO> getOrdenById(Integer id) {
         return ordenRepository.findById(id).map(OrdenResponseDTO::new);
     }
+
+    @Override
+    @Transactional
+    public OrdenResponseDTO updateOrden(Integer id, OrdenRequestDTO ordenDTO) {
+        Orden orden = ordenRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Orden no encontrada con ID: " + id));
+
+        // Solo permitimos actualizar comentario por ahora, o estado si se pasara en el
+        // DTO (pero el DTO actual no tiene estado explícito para update simple)
+        // Si se quisiera actualizar estado, habría que recibirlo. Asumiremos que este
+        // endpoint es para correcciones menores o podríamos agregar lógica de estado.
+        // Dado el requerimiento de "PUT", actualizaremos lo que viene en el DTO.
+
+        if (ordenDTO.getComentario() != null) {
+            orden.setComentario(ordenDTO.getComentario());
+        }
+
+        // Nota: Actualizar detalles es complejo (recalcular stock, totales, etc).
+        // Para este MVP, limitaremos el PUT a datos básicos.
+
+        return new OrdenResponseDTO(ordenRepository.save(orden));
+    }
+
+    @Override
+    @Transactional
+    public void deleteOrden(Integer id) {
+        Orden orden = ordenRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Orden no encontrada con ID: " + id));
+
+        // Reponer stock antes de eliminar (opcional, pero recomendado para
+        // consistencia)
+        for (DetalleOrden detalle : orden.getDetalles()) {
+            Producto producto = detalle.getProducto();
+            producto.setStock(producto.getStock() + detalle.getCantidad());
+            productoRepository.save(producto);
+        }
+
+        ordenRepository.delete(orden);
+    }
 }

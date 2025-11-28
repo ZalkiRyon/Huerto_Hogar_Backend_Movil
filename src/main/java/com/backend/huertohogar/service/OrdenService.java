@@ -11,4 +11,8 @@ public interface OrdenService {
     List<OrdenResponseDTO> getAllOrdenes();
 
     Optional<OrdenResponseDTO> getOrdenById(Integer id);
+
+    OrdenResponseDTO updateOrden(Integer id, OrdenRequestDTO ordenDTO);
+
+    void deleteOrden(Integer id);
 }

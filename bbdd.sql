@@ -70,10 +70,11 @@ CREATE TABLE `productos` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(150) NOT NULL,
   `categoria_id` int(11) NOT NULL,
-  `precio` int(11) NOT NULL DEFAULT 0,
-  `stock` int(11) NOT NULL DEFAULT 0,
+  `precio` int(11) NOT NULL,
+  `stock` int(11) NOT NULL,
   `descripcion` text,
   `imagen` varchar(255) DEFAULT NULL,
+  `activo` BOOLEAN NOT NULL DEFAULT TRUE,
   PRIMARY KEY (`id`),
   KEY `fk_producto_categoria` (`categoria_id`),
   CONSTRAINT `fk_producto_categoria` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`)
@@ -138,8 +139,7 @@ INSERT INTO `estados` (`id`, `nombre`) VALUES
 (3, 'Cancelado'),
 (4, 'Procesando');
 
--- Insertar Usuarios (Nota: role_id 1=admin, 2=cliente, 3=vendedor)
--- Corrección aplicada: 'Av. O''Higgins'
+-- Insertar Usuarios
 INSERT INTO `usuarios` (`id`, `email`, `password`, `role_id`, `nombre`, `apellido`, `run`, `telefono`, `region`, `comuna`, `direccion`, `comentario`, `fecha_registro`) VALUES
 (1, 'admin@duoc.cl', 'admin123', 1, 'Super', 'Administrador', '12.345.678-9', '912345678', 'region-metropolitana', 'santiago', 'Av. Providencia 1234, Oficina 501', 'Usuario administrador principal del sistema', '2024-01-15 08:00:00'),
 (2, 'maria.gonzalez@duoc.cl', 'admin456', 1, 'María José', 'González Pérez', '15.678.234-5', '987654321', 'region-valparaiso', 'valparaiso', 'Calle Esmeralda 789, Casa 12', 'Administradora de sistemas y base de datos', '2024-02-10 09:30:00'),
@@ -154,30 +154,22 @@ INSERT INTO `usuarios` (`id`, `email`, `password`, `role_id`, `nombre`, `apellid
 (11, 'carla.lopez@gmail.com', 'cliente102', 2, 'Carla Andrea', 'López Muñoz', '17.890.123-4', '945678901', 'region-valparaiso', 'vina-del-mar', 'Calle Alvares 567, Casa 23', 'Compra frutas y verduras semanalmente', '2024-04-05 14:30:00'),
 (12, 'roberto.sanchez@gmail.com', 'cliente103', 2, 'Roberto Andrés', 'Sánchez Vera', '14.567.234-9', '912345678', 'region-biobio', 'talcahuano', 'Pasaje Los Pinos 890, Villa Mar', 'Cliente VIP, pedidos grandes mensuales', '2024-04-10 09:15:00'),
 (13, 'maria.silva@gmail.com', 'cliente104', 2, 'María Cristina', 'Silva Rojas', '16.345.678-2', '967890123', 'region-maule', 'curico', 'Av. Manso de Velasco 1234', 'Prefiere productos lácteos y orgánicos', '2024-04-15 16:20:00'),
-(14, 'diego.morales@gmail.com', 'cliente105', 2, 'Diego Sebastián', 'Morales Castro', '19.123.456-7', '923456780', 'region-metropolitana', 'la-florida', 'Calle Walker Martinez 3456, Block A', 'Compra productos para eventos', '2024-04-20 11:45:00'),
-(15, 'valentina.rojas@gmail.com', 'cliente106', 2, 'Valentina Isabel', 'Rojas Hernández', '20.234.567-1', '934567892', 'region-ohiggins', 'san-fernando', 'Av. Libertador 789, Casa 45', 'Cliente regular, compra frutas frescas', '2024-04-25 13:10:00'),
-(16, 'francisco.gomez@gmail.com', 'cliente107', 2, 'Francisco Javier', 'Gómez Torres', '15.890.234-5', '978901234', 'region-araucania', 'villarrica', 'Camino Villarrica 234, Km 5', 'Prefiere productos orgánicos certificados', '2024-05-01 08:30:00'),
-(17, 'camila.vargas@gmail.com', 'cliente108', 2, 'Camila Fernanda', 'Vargas Pérez', '18.456.789-3', '956781235', 'region-metropolitana', 'nunoa', 'Av. Irarrázaval 5678, Depto 301', 'Compra productos para su familia', '2024-05-05 15:00:00'),
-(18, 'andres.munoz@gmail.com', 'cliente109', 2, 'Andrés Felipe', 'Muñoz Bravo', '12.789.345-6', '989012345', 'region-valparaiso', 'quilpue', 'Calle Freire 123, Villa Esperanza', 'Cliente desde el inicio, muy satisfecho', '2024-05-10 10:20:00'),
-(19, 'daniela.castro@gmail.com', 'cliente110', 2, 'Daniela Patricia', 'Castro Fuentes', '21.890.456-8', '945678903', 'region-biobio', 'los-angeles', 'Av. Ricardo Vicuña 456', 'Compra productos semanalmente', '2024-05-15 12:40:00');
+(14, 'diego.morales@gmail.com', 'cliente105', 2, 'Diego Sebastián', 'Morales Castro', '19.123.456-7', '923456780', 'region-metropolitana', 'la-florida', 'Calle Walker Martinez 3456, Block A', 'Compra productos para eventos', '2024-04-20 11:45:00');
 
--- Insertar Productos (Nota: categoria_id 1=Frutas, 2=Verduras, 3=Orgánicos, 4=Lácteos)
-INSERT INTO `productos` (`id`, `nombre`, `categoria_id`, `precio`, `stock`, `descripcion`, `imagen`) VALUES
-(1, 'FR001 - Manzanas Fuji', 1, 1200, 150, 'Manzanas Fuji crujientes y dulces, cultivadas en el Valle del Maule. Perfectas para meriendas saludables o como ingrediente en postres.', 'manzana.jpg'),
-(2, 'FR002 - Naranjas Valencia', 1, 1000, 200, 'Jugosas y ricas en vitamina C, estas naranjas Valencia son ideales para zumos frescos y refrescantes.', 'naranja.jpg'),
-(3, 'FR003 - Plátanos Cavendish', 1, 800, 250, 'Plátanos maduros y dulces, perfectos para el desayuno o como snack energético.', 'platano.jpg'),
-(4, 'VR001 - Zanahorias Organicas', 2, 900, 100, 'Zanahorias crujientes cultivadas sin pesticidas en la Región de O''Higgins.', 'zanahoria.jpg'),
-(5, 'VR002 - Espinacas Frescas', 2, 700, 80, 'Espinacas frescas y nutritivas, perfectas para ensaladas y batidos verdes.', 'espinaca.jpg'),
-(6, 'VR003 - Pimentones Tricolores', 2, 1500, 120, 'Pimientos rojos, amarillos y verdes, ideales para salteados y platos coloridos.', 'pimenton.jpg'),
-(7, 'PO001 - Miel Organica', 3, 5000, 50, 'Miel pura y orgánica producida por apicultores locales.', 'miel.jpg'),
-(8, 'PO002 - Quinua Organica', 3, 3000, 70, 'Grano andino altamente nutritivo, ideal para ensaladas, sopas y guarniciones.', 'quinoa.jpg'),
-(9, 'PL001 - Leche Entera', 4, 1200, 100, 'Leche fresca y pasteurizada, rica en calcio y vitaminas.', 'leche.jpg');
+-- Insertar Productos
+INSERT INTO `productos` (`id`, `nombre`, `categoria_id`, `precio`, `stock`, `descripcion`, `imagen`, `activo`) VALUES
+(1, 'Manzanas Fuji', 1, 1200, 100, 'Manzanas dulces y crujientes', 'manzanas.jpg', TRUE),
+(2, 'Plátanos', 1, 1000, 150, 'Plátanos importados de alta calidad', 'platanos.jpg', TRUE),
+(3, 'Lechuga Costina', 2, 800, 50, 'Lechuga fresca hidropónica', 'lechuga.jpg', TRUE),
+(4, 'Tomates Limachinos', 2, 900, 80, 'Tomates jugosos ideales para ensaladas', 'tomates.jpg', TRUE),
+(5, 'Huevos de Campo', 3, 700, 200, 'Huevos de gallinas libres', 'huevos.jpg', TRUE),
+(6, 'Leche Entera', 4, 1500, 60, 'Leche natural pasteurizada', 'leche.jpg', TRUE),
+(7, 'Queso Chanco', 4, 5000, 40, 'Queso mantecoso tradicional', 'queso.jpg', TRUE),
+(8, 'Zanahorias', 2, 3000, 70, 'Zanahorias orgánicas', 'zanahorias.jpg', TRUE),
+(9, 'Papas', 2, 1200, 300, 'Papas del sur', 'papas.jpg', TRUE);
 
--- Insertar Órdenes (Nota: estado_id 1=Enviado, 2=Pendiente, 3=Cancelado, 4=Procesando)
+-- Insertar Órdenes
 INSERT INTO `ordenes` (`id`, `numero_orden`, `cliente_id`, `fecha`, `estado_id`, `monto_total`, `departamento`, `comentario`) VALUES
-(1, 'SO1001', 4, '2024-06-01', 1, 21300, '', ''),
-(2, 'SO1002', 5, '2024-06-02', 2, 14500, '', ''),
-(3, 'SO1003', 6, '2024-06-02', 3, 8000, '', ''),
 (4, 'SO1004', 10, '2024-06-03', 4, 12000, '', ''),
 (5, 'SO1005', 11, '2024-06-04', 1, 16800, '', ''),
 (6, 'SO1006', 12, '2024-06-05', 2, 18500, '', ''),
