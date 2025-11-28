@@ -117,4 +117,10 @@ public class ProductoServiceImpl implements ProductoService {
         Producto updatedProducto = productoRepository.save(existingProducto);
         return new ProductoResponseDTO(updatedProducto);
     }
+
+    @Override
+    public Optional<String> getProductNameById(Integer id) {
+        return productoRepository.findById(id)
+                .map(Producto::getNombre);
+    }
 }

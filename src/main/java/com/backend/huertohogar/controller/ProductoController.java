@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/productos")
@@ -58,5 +59,14 @@ public class ProductoController {
         productoService.deleteProducto(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         // code 204
+    }
+
+    @GetMapping("/{id}/nombre")
+    public ResponseEntity<?> getProductName(@PathVariable Integer id) {
+        Optional<String> productName = productoService.getProductNameById(id);
+        return productName.map(name -> new ResponseEntity<>(name, HttpStatus.OK))
+                // code 200
+                .orElseGet(() -> new ResponseEntity<>("Producto no encontrado", HttpStatus.NOT_FOUND));
+                // code 404
     }
 }

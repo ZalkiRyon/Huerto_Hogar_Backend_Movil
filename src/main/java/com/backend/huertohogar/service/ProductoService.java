@@ -16,4 +16,6 @@ public interface ProductoService {
     void deleteProducto(Integer id);
 
     ProductoResponseDTO updateProducto(Integer id, ProductoRequestDTO productoDTO);
+
+    Optional<String> getProductNameById(Integer id);
 }
