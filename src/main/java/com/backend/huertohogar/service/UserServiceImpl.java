@@ -1,6 +1,5 @@
 package com.backend.huertohogar.service;
 
-
 import com.backend.huertohogar.dto.UserRequestDTO;
 import com.backend.huertohogar.dto.UserResponseDTO;
 import com.backend.huertohogar.model.Rol;
@@ -26,7 +25,6 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
         this.rolRepository = rolRepository;
     }
-
 
     @Override
     public List<UserResponseDTO> findAllUsers() {
@@ -69,18 +67,19 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("La Dirección es obligatoria y no puede estar vacía.");
         }
         if (password == null || password.length() < 4) {
-            throw new IllegalArgumentException("La contraseña es obligatoria y debe tener un largo mínimo de 4 caracteres.");
+            throw new IllegalArgumentException(
+                    "La contraseña es obligatoria y debe tener un largo mínimo de 4 caracteres.");
         }
         if (email == null || email.trim().isEmpty()) {
             throw new IllegalArgumentException("El Email es obligatorio.");
         }
-        if (!(email.endsWith("@duocuc.cl") || email.endsWith("@profesor.cl"))) {
-            throw new IllegalArgumentException("El formato de email no es válido. Debe terminar en @duocuc.cl o @profesor.cl.");
+        if (!(email.endsWith("@duocuc.cl") || email.endsWith("@profesor.duoc.cl"))) {
+            throw new IllegalArgumentException(
+                    "El formato de email no es válido. Debe terminar en @duocuc.cl o @profesor.duoc.cl.");
         }
         if (userRepository.findByEmail(email) != null) {
             throw new IllegalArgumentException("El email '" + email + "' ya se encuentra registrado.");
         }
-
 
         user.setEmail(email);
         user.setPassword(password);
@@ -107,7 +106,6 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("No se puede eliminar. Usuario no encontrado con ID: " + id);
         }
     }
-
 
     @Override
     public UserResponseDTO updateUser(Integer id, UserRequestDTO userDto) {
@@ -141,12 +139,14 @@ public class UserServiceImpl implements UserService {
         if (newEmail == null || newEmail.trim().isEmpty()) {
             throw new IllegalArgumentException("El Email es obligatorio.");
         }
-        if (!(newEmail.endsWith("@duocuc.cl") || newEmail.endsWith("@profesor.cl"))) {
-            throw new IllegalArgumentException("El formato de email no es válido. Debe terminar en @duocuc.cl o @profesor.cl.");
+        if (!(newEmail.endsWith("@duocuc.cl") || newEmail.endsWith("@profesor.duoc.cl"))) {
+            throw new IllegalArgumentException(
+                    "El formato de email no es válido. Debe terminar en @duocuc.cl o @profesor.duoc.cl.");
         }
         if (!newEmail.equals(existingUser.getEmail())) {
             if (userRepository.findByEmail(newEmail) != null) {
-                throw new IllegalArgumentException("El email '" + newEmail + "' ya se encuentra registrado por otro usuario.");
+                throw new IllegalArgumentException(
+                        "El email '" + newEmail + "' ya se encuentra registrado por otro usuario.");
             }
         }
         if (newPassword != null && !newPassword.isEmpty()) {
@@ -170,6 +170,5 @@ public class UserServiceImpl implements UserService {
         User updatedUser = userRepository.save(existingUser);
         return new UserResponseDTO(updatedUser);
     }
-
 
 }
