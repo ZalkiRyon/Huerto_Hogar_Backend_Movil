@@ -12,8 +12,17 @@ public class OrdenResponseDTO {
     private LocalDate fecha;
     private String estado;
     private Integer montoTotal;
-    private String clienteNombre;
+    private Integer costoEnvio;
     private String comentario;
+
+    // Snapshot fields
+    private String nombreClienteSnapshot;
+    private String emailClienteSnapshot;
+    private String direccionEnvio;
+    private String regionEnvio;
+    private String comunaEnvio;
+    private String telefonoContacto;
+
     private List<DetalleOrdenResponseDTO> detalles;
 
     public OrdenResponseDTO(Orden orden) {
@@ -22,8 +31,17 @@ public class OrdenResponseDTO {
         this.fecha = orden.getFecha();
         this.estado = orden.getEstado().getNombre();
         this.montoTotal = orden.getMontoTotal();
-        this.clienteNombre = orden.getUsuario().getNombre() + " " + orden.getUsuario().getApellido();
+        this.costoEnvio = orden.getCostoEnvio();
         this.comentario = orden.getComentario();
+
+        // Map snapshot fields
+        this.nombreClienteSnapshot = orden.getNombreClienteSnapshot();
+        this.emailClienteSnapshot = orden.getEmailClienteSnapshot();
+        this.direccionEnvio = orden.getDireccionEnvio();
+        this.regionEnvio = orden.getRegionEnvio();
+        this.comunaEnvio = orden.getComunaEnvio();
+        this.telefonoContacto = orden.getTelefonoContacto();
+
         this.detalles = orden.getDetalles().stream()
                 .map(DetalleOrdenResponseDTO::new)
                 .collect(Collectors.toList());
@@ -69,12 +87,12 @@ public class OrdenResponseDTO {
         this.montoTotal = montoTotal;
     }
 
-    public String getClienteNombre() {
-        return clienteNombre;
+    public Integer getCostoEnvio() {
+        return costoEnvio;
     }
 
-    public void setClienteNombre(String clienteNombre) {
-        this.clienteNombre = clienteNombre;
+    public void setCostoEnvio(Integer costoEnvio) {
+        this.costoEnvio = costoEnvio;
     }
 
     public String getComentario() {
@@ -83,6 +101,54 @@ public class OrdenResponseDTO {
 
     public void setComentario(String comentario) {
         this.comentario = comentario;
+    }
+
+    public String getNombreClienteSnapshot() {
+        return nombreClienteSnapshot;
+    }
+
+    public void setNombreClienteSnapshot(String nombreClienteSnapshot) {
+        this.nombreClienteSnapshot = nombreClienteSnapshot;
+    }
+
+    public String getEmailClienteSnapshot() {
+        return emailClienteSnapshot;
+    }
+
+    public void setEmailClienteSnapshot(String emailClienteSnapshot) {
+        this.emailClienteSnapshot = emailClienteSnapshot;
+    }
+
+    public String getDireccionEnvio() {
+        return direccionEnvio;
+    }
+
+    public void setDireccionEnvio(String direccionEnvio) {
+        this.direccionEnvio = direccionEnvio;
+    }
+
+    public String getRegionEnvio() {
+        return regionEnvio;
+    }
+
+    public void setRegionEnvio(String regionEnvio) {
+        this.regionEnvio = regionEnvio;
+    }
+
+    public String getComunaEnvio() {
+        return comunaEnvio;
+    }
+
+    public void setComunaEnvio(String comunaEnvio) {
+        this.comunaEnvio = comunaEnvio;
+    }
+
+    public String getTelefonoContacto() {
+        return telefonoContacto;
+    }
+
+    public void setTelefonoContacto(String telefonoContacto) {
+        this.telefonoContacto = telefonoContacto;
     }
 
     public List<DetalleOrdenResponseDTO> getDetalles() {

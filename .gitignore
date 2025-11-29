@@ -33,7 +33,7 @@ build/
 .vscode/
 
 # ignorar front referencial
-Front_Huerto_Hogar/
+Front/
 
 #docs referenciales
 docs/
