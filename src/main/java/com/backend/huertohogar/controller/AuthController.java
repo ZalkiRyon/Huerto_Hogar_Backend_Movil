@@ -2,6 +2,7 @@ package com.backend.huertohogar.controller;
 
 import com.backend.huertohogar.dto.AuthResponseDTO;
 import com.backend.huertohogar.dto.LoginRequestDTO;
+import com.backend.huertohogar.dto.UserDataDTO;
 import com.backend.huertohogar.model.User;
 import com.backend.huertohogar.security.CustomUserDetailsService;
 import com.backend.huertohogar.security.JwtUtil;
@@ -50,16 +51,25 @@ public class AuthController {
                     user.getId()
             );
 
-            // Crear respuesta con el token y datos del usuario
-            AuthResponseDTO response = new AuthResponseDTO(
-                    jwt,
+            // Crear objeto UserDataDTO con todos los datos del usuario
+            UserDataDTO userData = new UserDataDTO(
                     user.getId(),
                     user.getEmail(),
                     user.getNombre(),
                     user.getApellido(),
+                    user.getRun(),
+                    user.getTelefono(),
+                    user.getRegion(),
+                    user.getComuna(),
+                    user.getDireccion(),
+                    user.getComentario(),
+                    user.getFechaRegistro(),
                     user.getRol().getNombre(),
                     user.getRol().getId()
             );
+
+            // Crear respuesta con estructura anidada
+            AuthResponseDTO response = new AuthResponseDTO(jwt, userData);
 
             return ResponseEntity.ok(response);
 

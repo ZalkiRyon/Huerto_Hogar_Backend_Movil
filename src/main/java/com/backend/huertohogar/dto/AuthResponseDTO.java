@@ -3,23 +3,13 @@ package com.backend.huertohogar.dto;
 public class AuthResponseDTO {
     private String token;
     private String type = "Bearer";
-    private Integer userId;
-    private String email;
-    private String nombre;
-    private String apellido;
-    private String rolNombre;
-    private Integer roleId;
+    private UserDataDTO user;
 
     public AuthResponseDTO() {}
 
-    public AuthResponseDTO(String token, Integer userId, String email, String nombre, String apellido, String rolNombre, Integer roleId) {
+    public AuthResponseDTO(String token, UserDataDTO user) {
         this.token = token;
-        this.userId = userId;
-        this.email = email;
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.rolNombre = rolNombre;
-        this.roleId = roleId;
+        this.user = user;
     }
 
     public String getToken() {
@@ -38,51 +28,11 @@ public class AuthResponseDTO {
         this.type = type;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public UserDataDTO getUser() {
+        return user;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getApellido() {
-        return apellido;
-    }
-
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
-
-    public String getRolNombre() {
-        return rolNombre;
-    }
-
-    public void setRolNombre(String rolNombre) {
-        this.rolNombre = rolNombre;
-    }
-
-    public Integer getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(Integer roleId) {
-        this.roleId = roleId;
+    public void setUser(UserDataDTO user) {
+        this.user = user;
     }
 }
