@@ -200,7 +200,7 @@ INSERT INTO `productos` (`id`, `nombre`, `categoria_id`, `precio`, `stock`, `des
 (7, 'PO001 - Miel Organica', 3, 5000, 50, 'Miel pura y orgánica producida por apicultores locales.', 'miel.jpg', TRUE),
 (8, 'PO002 - Quinua Organica', 3, 3000, 70, 'Grano andino altamente nutritivo, ideal para ensaladas.', 'quinoa.jpg', TRUE),
 (9, 'PL001 - Leche Entera', 4, 1200, 100, 'Leche fresca y pasteurizada, rica en calcio y vitaminas.', 'leche.jpg', TRUE),
-(10, 'PL002 - Queso de cabra', 5, 5000, 100, 'Queso de cabra, alta en proteinas y calcio, contiene bajos niveles de grasaa saturadas.', 'queso.jpg', TRUE);
+(10, 'PL002 - Queso de cabra', 4, 5000, 100, 'Queso de cabra, alta en proteinas y calcio, contiene bajos niveles de grasaa saturadas.', 'queso.jpg', TRUE);
 
 -- Insertar Órdenes (CORREGIDO CON SNAPSHOTS Y CAMPOS DE DESPACHO)
 -- Nota: Se han extraído los datos de los usuarios correspondientes para llenar los snapshots.
