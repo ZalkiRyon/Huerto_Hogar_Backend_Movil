@@ -42,6 +42,20 @@ CREATE TABLE `estados` (
   UNIQUE KEY `nombre_unique` (`nombre`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Tabla de Blogs
+DROP TABLE IF EXISTS `blogs`;
+CREATE TABLE `blogs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `banner_img` varchar(100) NOT NULL,
+  `summary` text NOT NULL,
+  `body_text` text NOT NULL,
+  `author_img` varchar(100) NOT NULL,
+  `author_name` varchar(100) NOT NULL,
+  `publish_date` varchar(50) NOT NULL,
+  `tag` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 -- ========================================================
 -- TABLAS PRINCIPALES
 -- ========================================================
@@ -286,4 +300,26 @@ INSERT INTO `detalles_orden` (orden_id, producto_id, nombre_producto_snapshot, p
 (20, 7, 'PO001 - Miel Organica', 5000, 6, 30000),
 (20, 3, 'FR003 - Plátanos Cavendish', 800, 10, 8000);
 
+-- Insertar Blogs
+INSERT INTO `blogs` (`title`, `banner_img`, `summary`, `body_text`, `author_img`, `author_name`, `publish_date`, `tag`) VALUES
+(
+    'La importancia de consumir productos locales y frescos',
+    'blog1',
+    'Descubre por qué elegir frutas y verduras locales no solo beneficia tu salud, sino también a los agricultores y al medio ambiente.',
+    'En Huerto Hogar creemos que cada compra es una decisión con impacto. Al elegir productos frescos y locales, apoyas a familias agricultoras y reduces la huella de carbono. Los alimentos no recorren grandes distancias, lo que significa más frescura y menos contaminación. Te invitamos a cuidar tu salud y apoyar al campo con cada compra.',
+    'pf',
+    'Freddy Turbina',
+    '02 de Septiembre, 2025',
+    'Sostenibilidad'
+),
+(
+    'Cómo armar una despensa saludable con productos de Huerto Hogar',
+    'blog2',
+    'Aprende a organizar tu despensa con productos frescos y orgánicos que te ayudarán a llevar una alimentación balanceada y consciente.',
+    'Una despensa bien organizada es el primer paso hacia una vida más saludable. Llena tu cocina con lo mejor del campo: frutas frescas como manzanas y plátanos, y verduras orgánicas como zanahorias. No olvides básicos como la miel orgánica y la quinua. Con pequeñas elecciones diarias, transformas tu alimentación con la calidad que Huerto Hogar garantiza.',
+    'sv',
+    'Dante Torbolino',
+    '20 de Abril, 2025',
+    'Despensa saludable'
+);
 SET FOREIGN_KEY_CHECKS = 1;

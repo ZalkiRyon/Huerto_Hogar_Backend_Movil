@@ -64,6 +64,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/public/register/**").permitAll()
                         .requestMatchers("/api/productos/**").permitAll()
                         .requestMatchers("/api/ordenes/calcular-envio").permitAll()
+                        .requestMatchers("/api/blogs/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
                         // Endpoints de usuarios - solo admin
