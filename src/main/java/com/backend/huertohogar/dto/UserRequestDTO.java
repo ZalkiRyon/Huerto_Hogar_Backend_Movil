@@ -11,6 +11,7 @@ public class UserRequestDTO {
     private String comuna;
     private String direccion;
     private String comentario;
+    private String fotoPerfil;
 
     private Integer role_id;
 
@@ -103,5 +104,13 @@ public class UserRequestDTO {
 
     public void setRole_id(Integer role_id) {
         this.role_id = role_id;
+    }
+
+    public String getFotoPerfil() {
+        return fotoPerfil;
+    }
+
+    public void setFotoPerfil(String fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
     }
 }

@@ -103,6 +103,7 @@ public class UserServiceImpl implements UserService {
         user.setComentario(userDto.getComentario());
         user.setRol(rol);
         user.setFechaRegistro(LocalDateTime.now());
+        user.setFotoPerfil(userDto.getFotoPerfil());
 
         User savedUser = userRepository.save(user);
         return new UserResponseDTO(savedUser);
@@ -199,6 +200,7 @@ public class UserServiceImpl implements UserService {
         existingUser.setDireccion(userDto.getDireccion());
         existingUser.setComentario(userDto.getComentario());
         existingUser.setRol(rol);
+        existingUser.setFotoPerfil(userDto.getFotoPerfil());
 
         User updatedUser = userRepository.save(existingUser);
         return new UserResponseDTO(updatedUser);
