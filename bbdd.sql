@@ -57,7 +57,10 @@ CREATE TABLE `blogs` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Tabla de favoritos
+-- Tabla de favoritos (CON SOFT DELETE PROTECTION)
+-- Esta tabla NO usa CASCADE DELETE para proteger la integridad.
+-- Los favoritos solo se muestran si TANTO el usuario como el producto están activos.
+-- Si un usuario o producto se "elimina" (activo=FALSE), el favorito permanece en BD pero no se muestra.
 DROP TABLE IF EXISTS `favoritos`;
 CREATE TABLE `favoritos` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -70,14 +73,17 @@ CREATE TABLE `favoritos` (
 
   KEY `fk_favorito_usuario` (`usuario_id`),
   KEY `fk_favorito_producto` (`producto_id`),
-  CONSTRAINT `fk_favorito_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_favorito_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON DELETE CASCADE
+  
+  -- ON DELETE RESTRICT: Impide la eliminación física si existen favoritos
+  -- Esto fuerza el uso de soft delete (activo=FALSE) en usuarios y productos
+  CONSTRAINT `fk_favorito_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_favorito_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 -- ========================================================
 -- TABLAS PRINCIPALES
 -- ========================================================
 
--- 2. Tabla de Usuarios
+-- 2. Tabla de Usuarios (CON SOFT DELETE)
 DROP TABLE IF EXISTS `usuarios`;
 CREATE TABLE `usuarios` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -94,6 +100,7 @@ CREATE TABLE `usuarios` (
   `fotoPerfil` varchar(255) DEFAULT NULL,
   `comentario` text,
   `fecha_registro` datetime DEFAULT CURRENT_TIMESTAMP,
+  `activo` BOOLEAN NOT NULL DEFAULT TRUE, -- Soft delete: TRUE = activo, FALSE = eliminado
   PRIMARY KEY (`id`),
   UNIQUE KEY `email_unique` (`email`),
   UNIQUE KEY `run_unique` (`run`), -- Validación de unicidad para RUN
@@ -199,27 +206,27 @@ INSERT INTO `categorias` (`id`, `nombre`, `prefijo`) VALUES
 INSERT INTO `estados` (`id`, `nombre`) VALUES
 (1, 'Enviado'), (2, 'Pendiente'), (3, 'Cancelado'), (4, 'Procesando');
 
--- Insertar Usuarios
-INSERT INTO `usuarios` (`id`, `email`, `password`, `role_id`, `nombre`, `apellido`, `run`, `telefono`, `region`, `comuna`, `direccion`, `comentario`, `fecha_registro`, `fotoPerfil`) VALUES
-(1, 'admin@duocuc.cl', 'admin123', 1, 'Super', 'Administrador', '12.345.678-9', '912345678', 'region-metropolitana', 'santiago', 'Av. Providencia 1234, Oficina 501', 'Admin sistema', '2024-01-15 08:00:00', null),
-(2, 'maria.gonzalez@duocuc.cl', 'admin456', 1, 'María José', 'González Pérez', '15.678.234-5', '987654321', 'region-valparaiso', 'valparaiso', 'Calle Esmeralda 789, Casa 12', 'Admin DB', '2024-02-10 09:30:00', null),
-(3, 'carlos.torres@profesor.duoc.cl', 'admin789', 1, 'Carlos Eduardo', 'Torres Silva', '18.234.567-8', '956789123', 'region-biobio', 'concepcion', 'Av. O''Higgins 2456, Depto 34B', 'Admin académico', '2024-01-25 14:15:00', null),
-(4, 'ana.martinez@duocuc.cl', 'cliente123', 2, 'Ana María', 'Martínez López', '19.876.543-2', '945678912', 'region-metropolitana', 'las-condes', 'Av. Apoquindo 4567, Casa 78', 'Cliente VIP', '2024-03-05 10:20:00', null),
-(5, 'pedro.ramirez@duocuc.cl', 'cliente456', 2, 'Pedro Antonio', 'Ramírez Castro', '16.789.123-4', '934567891', 'region-ohiggins', 'rancagua', 'Calle San Martín 1234, Villa El Sauce', 'Cliente frecuente', '2024-02-28 16:45:00', null),
-(6, 'lucia.fernandez@duocuc.cl', 'cliente789', 2, 'Lucía Elena', 'Fernández Morales', '21.456.789-1', '923456789', 'region-araucania', 'temuco', 'Pasaje Los Aromos 567, Población Nueva', 'Estudiante DUOC', '2024-03-12 11:30:00', null),
-(7, 'rodrigo.silva@duocuc.cl', 'vendedor123', 3, 'Rodrigo Alejandro', 'Silva Mendoza', '17.345.678-9', '967891234', 'region-metropolitana', 'maipu', 'Av. Pajaritos 3456, Block 12, Depto 204', 'Vendedor frutas', '2024-02-15 08:45:00', null),
-(8, 'sofia.herrera@duocuc.cl', 'vendedor456', 3, 'Sofía Alejandra', 'Herrera Vásquez', '20.123.456-7', '956781234', 'region-maule', 'talca', 'Calle 1 Norte 2345, Villa Los Jardines', 'Vendedora lácteos', '2024-01-30 13:20:00', null),
-(9, 'miguel.rojas@profesor.duoc.cl', 'vendedor789', 3, 'Miguel Ángel', 'Rojas Contreras', '14.567.890-1', '912347856', 'region-valparaiso', 'vina-del-mar', 'Av. Libertad 1789, Casa 45', 'Vendedor verduras', '2024-02-05 15:10:00', null),
-(10, 'juan.perez@duocuc.cl', 'cliente101', 2, 'Juan Carlos', 'Pérez Soto', '13.234.567-8', '956789012', 'region-metropolitana', 'providencia', 'Av. Providencia 2345, Depto 12', 'Cliente orgánico', '2024-04-01 10:00:00', null),
-(11, 'carla.lopez@duocuc.cl', 'cliente102', 2, 'Carla Andrea', 'López Muñoz', '17.890.123-4', '945678901', 'region-valparaiso', 'vina-del-mar', 'Calle Alvares 567, Casa 23', 'Cliente semanal', '2024-04-05 14:30:00', null),
-(12, 'roberto.sanchez@duocuc.cl', 'cliente103', 2, 'Roberto Andrés', 'Sánchez Vera', '14.567.234-9', '912345678', 'region-biobio', 'talcahuano', 'Pasaje Los Pinos 890, Villa Mar', 'Cliente VIP', '2024-04-10 09:15:00', null),
-(13, 'maria.silva@duocuc.cl', 'cliente104', 2, 'María Cristina', 'Silva Rojas', '16.345.678-2', '967890123', 'region-maule', 'curico', 'Av. Manso de Velasco 1234', 'Cliente lácteos', '2024-04-15 16:20:00', null),
-(14, 'diego.morales@duocuc.cl', 'cliente105', 2, 'Diego Sebastián', 'Morales Castro', '19.123.456-7', '923456780', 'region-metropolitana', 'la-florida', 'Calle Walker Martinez 3456, Block A', 'Cliente eventos', '2024-04-20 11:45:00', null),
-(15, 'valentina.rojas@duocuc.cl', 'cliente106', 2, 'Valentina Isabel', 'Rojas Hernández', '20.234.567-1', '934567892', 'region-ohiggins', 'san-fernando', 'Av. Libertador 789, Casa 45', 'Cliente regular', '2024-04-25 13:10:00', null),
-(16, 'francisco.gomez@duocuc.cl', 'cliente107', 2, 'Francisco Javier', 'Gómez Torres', '15.890.234-5', '978901234', 'region-araucania', 'villarrica', 'Camino Villarrica 234, Km 5', 'Cliente certificado', '2024-05-01 08:30:00', null),
-(17, 'camila.vargas@duocuc.cl', 'cliente108', 2, 'Camila Fernanda', 'Vargas Pérez', '18.456.789-3', '956781235', 'region-metropolitana', 'nunoa', 'Av. Irarrázaval 5678, Depto 301', 'Cliente familia', '2024-05-05 15:00:00', null),
-(18, 'andres.munoz@duocuc.cl', 'cliente109', 2, 'Andrés Felipe', 'Muñoz Bravo', '12.789.345-6', '989012345', 'region-valparaiso', 'quilpue', 'Calle Freire 123, Villa Esperanza', 'Cliente fiel', '2024-05-10 10:20:00', null),
-(19, 'daniela.castro@duocuc.cl', 'cliente110', 2, 'Daniela Patricia', 'Castro Fuentes', '21.890.456-8', '945678903', 'region-biobio', 'los-angeles', 'Av. Ricardo Vicuña 456', 'Cliente semanal', '2024-05-15 12:40:00', null);
+-- Insertar Usuarios (con campo activo por defecto TRUE)
+INSERT INTO `usuarios` (`id`, `email`, `password`, `role_id`, `nombre`, `apellido`, `run`, `telefono`, `region`, `comuna`, `direccion`, `comentario`, `fecha_registro`, `fotoPerfil`, `activo`) VALUES
+(1, 'admin@duocuc.cl', 'admin123', 1, 'Super', 'Administrador', '12.345.678-9', '912345678', 'region-metropolitana', 'santiago', 'Av. Providencia 1234, Oficina 501', 'Admin sistema', '2024-01-15 08:00:00', null, TRUE),
+(2, 'maria.gonzalez@duocuc.cl', 'admin456', 1, 'María José', 'González Pérez', '15.678.234-5', '987654321', 'region-valparaiso', 'valparaiso', 'Calle Esmeralda 789, Casa 12', 'Admin DB', '2024-02-10 09:30:00', null, TRUE),
+(3, 'carlos.torres@profesor.duoc.cl', 'admin789', 1, 'Carlos Eduardo', 'Torres Silva', '18.234.567-8', '956789123', 'region-biobio', 'concepcion', 'Av. O''Higgins 2456, Depto 34B', 'Admin académico', '2024-01-25 14:15:00', null, TRUE),
+(4, 'ana.martinez@duocuc.cl', 'cliente123', 2, 'Ana María', 'Martínez López', '19.876.543-2', '945678912', 'region-metropolitana', 'las-condes', 'Av. Apoquindo 4567, Casa 78', 'Cliente VIP', '2024-03-05 10:20:00', null, TRUE),
+(5, 'pedro.ramirez@duocuc.cl', 'cliente456', 2, 'Pedro Antonio', 'Ramírez Castro', '16.789.123-4', '934567891', 'region-ohiggins', 'rancagua', 'Calle San Martín 1234, Villa El Sauce', 'Cliente frecuente', '2024-02-28 16:45:00', null, TRUE),
+(6, 'lucia.fernandez@duocuc.cl', 'cliente789', 2, 'Lucía Elena', 'Fernández Morales', '21.456.789-1', '923456789', 'region-araucania', 'temuco', 'Pasaje Los Aromos 567, Población Nueva', 'Estudiante DUOC', '2024-03-12 11:30:00', null, TRUE),
+(7, 'rodrigo.silva@duocuc.cl', 'vendedor123', 3, 'Rodrigo Alejandro', 'Silva Mendoza', '17.345.678-9', '967891234', 'region-metropolitana', 'maipu', 'Av. Pajaritos 3456, Block 12, Depto 204', 'Vendedor frutas', '2024-02-15 08:45:00', null, TRUE),
+(8, 'sofia.herrera@duocuc.cl', 'vendedor456', 3, 'Sofía Alejandra', 'Herrera Vásquez', '20.123.456-7', '956781234', 'region-maule', 'talca', 'Calle 1 Norte 2345, Villa Los Jardines', 'Vendedora lácteos', '2024-01-30 13:20:00', null, TRUE),
+(9, 'miguel.rojas@profesor.duoc.cl', 'vendedor789', 3, 'Miguel Ángel', 'Rojas Contreras', '14.567.890-1', '912347856', 'region-valparaiso', 'vina-del-mar', 'Av. Libertad 1789, Casa 45', 'Vendedor verduras', '2024-02-05 15:10:00', null, TRUE),
+(10, 'juan.perez@duocuc.cl', 'cliente101', 2, 'Juan Carlos', 'Pérez Soto', '13.234.567-8', '956789012', 'region-metropolitana', 'providencia', 'Av. Providencia 2345, Depto 12', 'Cliente orgánico', '2024-04-01 10:00:00', null, TRUE),
+(11, 'carla.lopez@duocuc.cl', 'cliente102', 2, 'Carla Andrea', 'López Muñoz', '17.890.123-4', '945678901', 'region-valparaiso', 'vina-del-mar', 'Calle Alvares 567, Casa 23', 'Cliente semanal', '2024-04-05 14:30:00', null, TRUE),
+(12, 'roberto.sanchez@duocuc.cl', 'cliente103', 2, 'Roberto Andrés', 'Sánchez Vera', '14.567.234-9', '912345678', 'region-biobio', 'talcahuano', 'Pasaje Los Pinos 890, Villa Mar', 'Cliente VIP', '2024-04-10 09:15:00', null, TRUE),
+(13, 'maria.silva@duocuc.cl', 'cliente104', 2, 'María Cristina', 'Silva Rojas', '16.345.678-2', '967890123', 'region-maule', 'curico', 'Av. Manso de Velasco 1234', 'Cliente lácteos', '2024-04-15 16:20:00', null, TRUE),
+(14, 'diego.morales@duocuc.cl', 'cliente105', 2, 'Diego Sebastián', 'Morales Castro', '19.123.456-7', '923456780', 'region-metropolitana', 'la-florida', 'Calle Walker Martinez 3456, Block A', 'Cliente eventos', '2024-04-20 11:45:00', null, TRUE),
+(15, 'valentina.rojas@duocuc.cl', 'cliente106', 2, 'Valentina Isabel', 'Rojas Hernández', '20.234.567-1', '934567892', 'region-ohiggins', 'san-fernando', 'Av. Libertador 789, Casa 45', 'Cliente regular', '2024-04-25 13:10:00', null, TRUE),
+(16, 'francisco.gomez@duocuc.cl', 'cliente107', 2, 'Francisco Javier', 'Gómez Torres', '15.890.234-5', '978901234', 'region-araucania', 'villarrica', 'Camino Villarrica 234, Km 5', 'Cliente certificado', '2024-05-01 08:30:00', null, TRUE),
+(17, 'camila.vargas@duocuc.cl', 'cliente108', 2, 'Camila Fernanda', 'Vargas Pérez', '18.456.789-3', '956781235', 'region-metropolitana', 'nunoa', 'Av. Irarrázaval 5678, Depto 301', 'Cliente familia', '2024-05-05 15:00:00', null, TRUE),
+(18, 'andres.munoz@duocuc.cl', 'cliente109', 2, 'Andrés Felipe', 'Muñoz Bravo', '12.789.345-6', '989012345', 'region-valparaiso', 'quilpue', 'Calle Freire 123, Villa Esperanza', 'Cliente fiel', '2024-05-10 10:20:00', null, TRUE),
+(19, 'daniela.castro@duocuc.cl', 'cliente110', 2, 'Daniela Patricia', 'Castro Fuentes', '21.890.456-8', '945678903', 'region-biobio', 'los-angeles', 'Av. Ricardo Vicuña 456', 'Cliente semanal', '2024-05-15 12:40:00', null, TRUE);
 
 -- Insertar Productos
 INSERT INTO `productos` (`id`, `nombre`, `categoria_id`, `precio`, `stock`, `descripcion`, `imagen`, `activo`) VALUES

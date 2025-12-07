@@ -49,6 +49,9 @@ public class User {
     @Column(name = "fotoPerfil", length = 255)
     private String fotoPerfil;
 
+    @Column(nullable = false)
+    private Boolean activo = true;
+
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Rol rol;
@@ -166,5 +169,13 @@ public class User {
 
     public void setFotoPerfil(String fotoPerfil) {
         this.fotoPerfil = fotoPerfil;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 }
