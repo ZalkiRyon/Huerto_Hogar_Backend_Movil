@@ -1,5 +1,14 @@
 package com.backend.huertohogar.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.backend.huertohogar.dto.UserRequestDTO;
 import com.backend.huertohogar.dto.UserResponseDTO;
 import com.backend.huertohogar.exception.ResourceNotFoundException;
@@ -8,14 +17,6 @@ import com.backend.huertohogar.model.Rol;
 import com.backend.huertohogar.model.User;
 import com.backend.huertohogar.repository.RolRepository;
 import com.backend.huertohogar.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -104,6 +105,7 @@ public class UserServiceImpl implements UserService {
         user.setRol(rol);
         user.setFechaRegistro(LocalDateTime.now());
         user.setFotoPerfil(userDto.getFotoPerfil());
+        user.setActivo(true); // New users are active by default
 
         User savedUser = userRepository.save(user);
         return new UserResponseDTO(savedUser);
@@ -111,11 +113,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Integer id) {
-        if (userRepository.findById(id).isPresent()) {
-            userRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("No se puede eliminar. Usuario no encontrado con ID: " + id);
-        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
+        
+        // Soft delete ONLY - preserve favorites for potential reactivation
+        user.setActivo(false);
+        userRepository.save(user);
     }
 
     @Override

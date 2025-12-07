@@ -27,27 +27,27 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
+// @EnableMethodSecurity(prePostEnabled = true) // DISABLED FOR TESTING
 public class SecurityConfig {
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+    // JWT SECURITY COMPLETELY DISABLED
+    // @Autowired
+    // private CustomUserDetailsService userDetailsService;
 
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    // @Autowired
+    // private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
 
-        // Permite credenciales (necesario para JWT)
-        config.setAllowCredentials(true);
+        // Permite credenciales
+        config.setAllowCredentials(false); // Changed to false since no auth
 
-
-        config.addAllowedOrigin("http://localhost:3000"); // Asegúrate que este sea el puerto de tu React
-        config.addAllowedHeader("*"); // Permite todos los headers (incluyendo Authorization)
-        config.addAllowedMethod("*"); // Permite todos los métodos (GET, POST, etc.)
+        config.addAllowedOrigin("*"); // Allow all origins
+        config.addAllowedHeader("*"); // Allow all headers
+        config.addAllowedMethod("*"); // Allow all methods
 
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
@@ -55,36 +55,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // SECURITY COMPLETELY DISABLED - ALL ENDPOINTS PUBLIC
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        // Endpoints públicos (sin autenticación)
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/public/register/**").permitAll()
-                        .requestMatchers("/api/productos/**").permitAll()
-                        .requestMatchers("/api/ordenes/calcular-envio").permitAll()
-                        .requestMatchers("/api/blogs/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-
-                        // Endpoints de favoritos - solo cliente
-                        .requestMatchers("/api/favoritos/**").hasRole("CLIENTE")
-
-                        // Endpoints de usuarios - solo admin
-                        .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
-
-                        // Endpoints de órdenes - admin y vendedor pueden ver/gestionar
-                        .requestMatchers("/api/ordenes/**").hasAnyRole("ADMIN", "VENDEDOR", "CLIENTE")
-
-                        // Endpoints de roles - solo admin
-                        .requestMatchers("/api/roles/**").hasRole("ADMIN")
-
-                        // Cualquier otra petición requiere autenticación
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll() // PERMIT ALL REQUESTS
+                )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                // .authenticationProvider(authenticationProvider()) // DISABLED
+                // .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // DISABLED
 
         return http.build();
     }
@@ -111,13 +92,34 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("*")); // Allow all origins
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(false); // No credentials needed
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+    // AUTHENTICATION BEANS DISABLED
+    /*
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
+    }
+    */
 }

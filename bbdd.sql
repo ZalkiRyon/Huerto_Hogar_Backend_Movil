@@ -57,10 +57,17 @@ CREATE TABLE `blogs` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Tabla de favoritos (CON SOFT DELETE PROTECTION)
--- Esta tabla NO usa CASCADE DELETE para proteger la integridad.
--- Los favoritos solo se muestran si TANTO el usuario como el producto están activos.
--- Si un usuario o producto se "elimina" (activo=FALSE), el favorito permanece en BD pero no se muestra.
+-- Tabla de favoritos (HYBRID SOFT DELETE LOGIC)
+-- LÓGICA IMPLEMENTADA:
+-- 1. Si un PRODUCTO se desactiva (activo=FALSE) → Backend debe ELIMINAR físicamente los favoritos
+--    Esto mantiene la tabla limpia y evita referencias a productos inactivos
+-- 2. Si un USUARIO se desactiva (activo=FALSE) → Los favoritos PERMANECEN en la tabla
+--    Pero las queries del backend deben filtrar por usuario.activo = TRUE
+--    Si el usuario se reactiva, recupera sus favoritos automáticamente
+--
+-- IMPORTANTE: El backend debe implementar triggers o lógica en el servicio para:
+-- - Al hacer soft delete de producto: DELETE FROM favoritos WHERE producto_id = ?
+-- - Al consultar favoritos: JOIN con usuarios WHERE usuarios.activo = TRUE
 DROP TABLE IF EXISTS `favoritos`;
 CREATE TABLE `favoritos` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -74,9 +81,12 @@ CREATE TABLE `favoritos` (
   KEY `fk_favorito_usuario` (`usuario_id`),
   KEY `fk_favorito_producto` (`producto_id`),
   
-  -- ON DELETE RESTRICT: Impide la eliminación física si existen favoritos
-  -- Esto fuerza el uso de soft delete (activo=FALSE) en usuarios y productos
+  -- Usuario: RESTRICT (no permite borrado físico, fuerza soft delete)
+  -- Los favoritos se mantienen si el usuario está inactivo, permitiendo recuperación
   CONSTRAINT `fk_favorito_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE RESTRICT,
+  
+  -- Producto: RESTRICT también (el backend debe manejar la limpieza manualmente)
+  -- Esto da control total al backend para decidir cuándo limpiar favoritos
   CONSTRAINT `fk_favorito_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 -- ========================================================

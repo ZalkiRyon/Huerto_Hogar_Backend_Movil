@@ -1,5 +1,13 @@
 package com.backend.huertohogar.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.backend.huertohogar.dto.ProductoRequestDTO;
 import com.backend.huertohogar.dto.ProductoResponseDTO;
 import com.backend.huertohogar.exception.ResourceNotFoundException;
@@ -7,24 +15,21 @@ import com.backend.huertohogar.exception.ValidationException;
 import com.backend.huertohogar.model.Categoria;
 import com.backend.huertohogar.model.Producto;
 import com.backend.huertohogar.repository.CategoriaRepository;
+import com.backend.huertohogar.repository.FavoritoRepository;
 import com.backend.huertohogar.repository.ProductoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductoServiceImpl implements ProductoService {
 
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
+    private final FavoritoRepository favoritoRepository;
 
     @Autowired
-    public ProductoServiceImpl(ProductoRepository productoRepository, CategoriaRepository categoriaRepository) {
+    public ProductoServiceImpl(ProductoRepository productoRepository, CategoriaRepository categoriaRepository, FavoritoRepository favoritoRepository) {
         this.productoRepository = productoRepository;
         this.categoriaRepository = categoriaRepository;
+        this.favoritoRepository = favoritoRepository;
     }
 
     @Override
@@ -204,11 +209,15 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
+    @Transactional
     public void deleteProducto(Integer id) {
         Producto producto = productoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con ID: " + id));
 
-        // Borrado lógico
+        // STEP 1: Delete all favorites referencing this product (physical cleanup)
+        favoritoRepository.deleteByProductoId(id);
+        
+        // STEP 2: Soft delete the product
         producto.setActivo(false);
         productoRepository.save(producto);
     }
