@@ -46,11 +46,15 @@ public class User {
     @Column(nullable = false, name = "fecha_registro")
     private LocalDateTime fechaRegistro;
 
+    @Column(name = "fotoPerfil", length = 255)
+    private String fotoPerfil;
+
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Rol rol;
 
-    public User() {}
+    public User() {
+    }
 
     public Integer getId() {
         return id;
@@ -154,5 +158,13 @@ public class User {
 
     public void setRol(Rol rol) {
         this.rol = rol;
+    }
+
+    public String getFotoPerfil() {
+        return fotoPerfil;
+    }
+
+    public void setFotoPerfil(String fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
     }
 }

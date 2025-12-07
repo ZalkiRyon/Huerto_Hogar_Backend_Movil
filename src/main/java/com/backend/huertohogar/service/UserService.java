@@ -15,4 +15,6 @@ public interface UserService {
     void deleteUser(Integer id);
 
     UserResponseDTO updateUser(Integer id, UserRequestDTO user);
+
+    Integer findIdByEmail(String email);
 }

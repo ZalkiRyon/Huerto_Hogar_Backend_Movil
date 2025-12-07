@@ -103,6 +103,7 @@ public class UserServiceImpl implements UserService {
         user.setComentario(userDto.getComentario());
         user.setRol(rol);
         user.setFechaRegistro(LocalDateTime.now());
+        user.setFotoPerfil(userDto.getFotoPerfil());
 
         User savedUser = userRepository.save(user);
         return new UserResponseDTO(savedUser);
@@ -155,10 +156,10 @@ public class UserServiceImpl implements UserService {
         if (newEmail == null || newEmail.trim().isEmpty()) {
             throw new ValidationException("El Email es obligatorio.");
         }
-        
+
         // Normalizar email a minúsculas para comparación consistente
         newEmail = newEmail.trim().toLowerCase();
-        
+
         if (!(newEmail.endsWith("@duocuc.cl") || newEmail.endsWith("@profesor.duoc.cl"))) {
             throw new IllegalArgumentException(
                     "El formato de email no es válido. Debe terminar en @duocuc.cl o @profesor.duoc.cl.");
@@ -199,9 +200,26 @@ public class UserServiceImpl implements UserService {
         existingUser.setDireccion(userDto.getDireccion());
         existingUser.setComentario(userDto.getComentario());
         existingUser.setRol(rol);
+        existingUser.setFotoPerfil(userDto.getFotoPerfil());
 
         User updatedUser = userRepository.save(existingUser);
         return new UserResponseDTO(updatedUser);
     }
+
+    @Override
+    public Integer findIdByEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("El email de autenticación no puede ser nulo o vacío.");
+        }
+
+        User user = userRepository.findByEmail(email);
+
+        if (user == null) {
+            throw new ResourceNotFoundException("Usuario autenticado no encontrado con email: " + email);
+        }
+
+        return user.getId();
+    }
+
 
 }

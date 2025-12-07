@@ -67,6 +67,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/blogs/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
+                        // Endpoints de favoritos - solo cliente
+                        .requestMatchers("/api/favoritos/**").hasRole("CLIENTE")
+
                         // Endpoints de usuarios - solo admin
                         .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
 
@@ -112,7 +115,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
