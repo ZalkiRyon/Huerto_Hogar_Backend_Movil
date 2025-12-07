@@ -10,6 +10,7 @@ import com.backend.huertohogar.repository.RolRepository;
 import com.backend.huertohogar.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -221,5 +222,19 @@ public class UserServiceImpl implements UserService {
         return user.getId();
     }
 
+    @Override
+    @Transactional
+    public void updateFotoPerfil(Integer userId, String fileName) {
+
+        // Buscar al usuario por ID
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + userId));
+
+        // Establecer el nuevo nombre/ruta del archivo
+        existingUser.setFotoPerfil(fileName);
+
+        // Guardar el usuario actualizado en la base de datos
+        userRepository.save(existingUser);
+    }
 
 }

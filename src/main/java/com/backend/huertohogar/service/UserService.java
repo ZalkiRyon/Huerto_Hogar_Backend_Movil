@@ -17,4 +17,6 @@ public interface UserService {
     UserResponseDTO updateUser(Integer id, UserRequestDTO user);
 
     Integer findIdByEmail(String email);
+
+    void updateFotoPerfil(Integer userId, String fileName);
 }

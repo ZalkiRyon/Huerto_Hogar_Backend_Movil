@@ -65,6 +65,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/productos/**").permitAll()
                         .requestMatchers("/api/ordenes/calcular-envio").permitAll()
                         .requestMatchers("/api/blogs/**").permitAll()
+                        .requestMatchers("/api/files/download/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
                         // Endpoints de favoritos - solo cliente

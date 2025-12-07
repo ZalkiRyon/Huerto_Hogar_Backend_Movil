@@ -2,11 +2,15 @@ package com.backend.huertohogar.controller;
 
 import com.backend.huertohogar.dto.UserRequestDTO;
 import com.backend.huertohogar.dto.UserResponseDTO;
+import com.backend.huertohogar.service.FileStorageService;
 import com.backend.huertohogar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -16,10 +20,12 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final FileStorageService fileStorageService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, FileStorageService fileStorageService) {
         this.userService = userService;
+        this.fileStorageService = fileStorageService;
     }
 
     @GetMapping
@@ -61,5 +67,21 @@ public class UserController {
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         // code 204
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/upload-foto")
+    public ResponseEntity<String> uploadFotoPerfil(@RequestParam("file") MultipartFile file, Authentication authentication) {
+
+        // Obtener la ID del usuario autenticado (usando el helper que ya creaste)
+        Integer userId = userService.findIdByEmail(authentication.getName());
+
+        // Línea 2: Guardar el archivo físicamente (requiere Disco/Permisos)
+        String fileName = fileStorageService.storeFile(file);
+
+        // Línea 3: Actualizar la entidad User con el nombre del archivo (requiere DB)
+        userService.updateFotoPerfil(userId, fileName);
+
+        return new ResponseEntity<>("Foto de perfil subida y actualizada. Nombre: " + fileName, HttpStatus.OK);
     }
 }
