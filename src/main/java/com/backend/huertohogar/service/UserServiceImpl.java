@@ -33,7 +33,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponseDTO> findAllUsers() {
-        return userRepository.findAll().stream()
+        // Solo retornar usuarios activos (no eliminados)
+        return userRepository.findByActivoTrue().stream()
                 .map(UserResponseDTO::new)
                 .collect(Collectors.toList());
     }
