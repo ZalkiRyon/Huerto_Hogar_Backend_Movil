@@ -176,4 +176,24 @@ public class UserController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    
+    /**
+     * Obtiene todos los usuarios incluyendo inactivos (solo admin)
+     * GET /api/usuarios/todos
+     */
+    @GetMapping("/todos")
+    public ResponseEntity<List<UserResponseDTO>> getAllUsersIncludingInactive() {
+        List<UserResponseDTO> users = userService.findAllUsersIncludingInactive();
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+    
+    /**
+     * Reactiva un usuario desactivado (solo admin)
+     * PATCH /api/usuarios/{id}/reactivar
+     */
+    @org.springframework.web.bind.annotation.PatchMapping("/{id}/reactivar")
+    public ResponseEntity<Void> reactivateUser(@PathVariable Integer id) {
+        userService.reactivateUser(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

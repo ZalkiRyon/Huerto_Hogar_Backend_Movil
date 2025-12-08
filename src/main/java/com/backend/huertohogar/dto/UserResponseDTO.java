@@ -1,8 +1,8 @@
 package com.backend.huertohogar.dto;
 
-import com.backend.huertohogar.model.User;
-
 import java.time.LocalDateTime;
+
+import com.backend.huertohogar.model.User;
 
 public class UserResponseDTO {
     private Integer id;
@@ -18,6 +18,7 @@ public class UserResponseDTO {
     private String comentario;
     private LocalDateTime fechaRegistro;
     private String fotoPerfil;
+    private Boolean activo;
 
     private String roleNombre;
 
@@ -35,6 +36,7 @@ public class UserResponseDTO {
         this.comentario = user.getComentario();
         this.fechaRegistro = user.getFechaRegistro();
         this.fotoPerfil = user.getFotoPerfil();
+        this.activo = user.getActivo();
 
         if (user.getRol() != null) {
             this.roleNombre = user.getRol().getNombre();
@@ -151,5 +153,13 @@ public class UserResponseDTO {
 
     public void setFotoPerfil(String fotoPerfil) {
         this.fotoPerfil = fotoPerfil;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 }

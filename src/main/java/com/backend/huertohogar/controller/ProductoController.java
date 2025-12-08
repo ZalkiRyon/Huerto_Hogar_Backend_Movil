@@ -1,17 +1,28 @@
 package com.backend.huertohogar.controller;
 
-import com.backend.huertohogar.dto.ProductoRequestDTO;
-import com.backend.huertohogar.dto.ProductoResponseDTO;
-import com.backend.huertohogar.service.ProductoService;
-import jakarta.validation.Valid;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Optional;
+import com.backend.huertohogar.dto.ProductoRequestDTO;
+import com.backend.huertohogar.dto.ProductoResponseDTO;
+import com.backend.huertohogar.service.ProductoService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/productos")
@@ -28,6 +39,14 @@ public class ProductoController {
     @GetMapping
     public ResponseEntity<List<ProductoResponseDTO>> getAllProductos() {
         List<ProductoResponseDTO> productos = productoService.getAllProductos();
+        return new ResponseEntity<>(productos, HttpStatus.OK);
+        // code 200
+    }
+
+    @GetMapping("/todos")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<ProductoResponseDTO>> getAllProductosIncludingInactive() {
+        List<ProductoResponseDTO> productos = productoService.getAllProductosIncludingInactive();
         return new ResponseEntity<>(productos, HttpStatus.OK);
         // code 200
     }
@@ -64,6 +83,14 @@ public class ProductoController {
         productoService.deleteProducto(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         // code 204
+    }
+
+    @PatchMapping("/{id}/reactivar")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> reactivateProducto(@PathVariable Integer id) {
+        productoService.reactivateProducto(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+        // code 200
     }
 
     @GetMapping("/{id}/nombre")

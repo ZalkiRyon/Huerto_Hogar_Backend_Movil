@@ -209,6 +209,22 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
+    public List<ProductoResponseDTO> getAllProductosIncludingInactive() {
+        return productoRepository.findAll().stream()
+                .map(ProductoResponseDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void reactivateProducto(Integer id) {
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con ID: " + id));
+        producto.setActivo(true);
+        productoRepository.save(producto);
+    }
+
+    @Override
     @Transactional
     public void deleteProducto(Integer id) {
         Producto producto = productoRepository.findById(id)

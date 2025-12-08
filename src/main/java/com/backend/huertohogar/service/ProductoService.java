@@ -1,13 +1,15 @@
 package com.backend.huertohogar.service;
 
-import com.backend.huertohogar.dto.ProductoRequestDTO;
-import com.backend.huertohogar.dto.ProductoResponseDTO;
-
 import java.util.List;
 import java.util.Optional;
 
+import com.backend.huertohogar.dto.ProductoRequestDTO;
+import com.backend.huertohogar.dto.ProductoResponseDTO;
+
 public interface ProductoService {
     List<ProductoResponseDTO> getAllProductos();
+
+    List<ProductoResponseDTO> getAllProductosIncludingInactive();
 
     Optional<ProductoResponseDTO> getProductoById(Integer id);
 
@@ -18,4 +20,6 @@ public interface ProductoService {
     ProductoResponseDTO updateProducto(Integer id, ProductoRequestDTO productoDTO);
 
     Optional<String> getProductNameById(Integer id);
+
+    void reactivateProducto(Integer id);
 }

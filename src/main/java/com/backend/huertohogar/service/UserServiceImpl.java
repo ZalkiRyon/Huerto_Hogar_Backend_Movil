@@ -211,6 +211,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<UserResponseDTO> findAllUsersIncludingInactive() {
+        return userRepository.findAll().stream()
+                .map(UserResponseDTO::new)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public void reactivateUser(Integer id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
+        
+        user.setActivo(true);
+        userRepository.save(user);
+    }
+    
+    @Override
     public Integer findIdByEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
             throw new IllegalArgumentException("El email de autenticación no puede ser nulo o vacío.");

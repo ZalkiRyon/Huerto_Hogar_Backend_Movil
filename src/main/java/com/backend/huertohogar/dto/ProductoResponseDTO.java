@@ -10,6 +10,7 @@ public class ProductoResponseDTO {
     private Integer stock;
     private String descripcion;
     private String imagen;
+    private Boolean activo;
 
     public ProductoResponseDTO() {
     }
@@ -22,6 +23,7 @@ public class ProductoResponseDTO {
         this.stock = producto.getStock();
         this.descripcion = producto.getDescripcion();
         this.imagen = producto.getImagen();
+        this.activo = producto.getActivo();
     }
 
     public Integer getId() {
@@ -78,5 +80,13 @@ public class ProductoResponseDTO {
 
     public void setImagen(String imagen) {
         this.imagen = imagen;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 }
