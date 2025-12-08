@@ -44,6 +44,16 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
+    public List<ProductoResponseDTO> getProductosByCategory(String category) {
+        return productoRepository.findAll().stream()
+                .filter(p -> (p.getActivo() == null || p.getActivo()) && 
+                             p.getCategoria() != null && 
+                             p.getCategoria().getNombre().equalsIgnoreCase(category))
+                .map(ProductoResponseDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Optional<ProductoResponseDTO> getProductoById(Integer id) {
         return productoRepository.findById(id)
                 .filter(p -> p.getActivo() == null || p.getActivo())
