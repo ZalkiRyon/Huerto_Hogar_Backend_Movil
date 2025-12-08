@@ -14,6 +14,7 @@ API REST desarrollada con Spring Boot para la plataforma e-commerce Huerto Hogar
 - **MySQL** - Base de datos relacional
 - **Maven** - Gestión de dependencias
 - **Springdoc OpenAPI 2.6.0** - Documentación Swagger UI
+- **Cloudinary** - Hosting de imágenes externo (CDN)
 
 ## Requisitos Previos
 
@@ -22,6 +23,7 @@ API REST desarrollada con Spring Boot para la plataforma e-commerce Huerto Hogar
 - **MySQL 8.0+**
 - Puerto **8080** disponible para el servidor
 - Puerto **3306** disponible para MySQL
+- **Cuenta de Cloudinary** (gratuita) - https://cloudinary.com
 
 ## Instalación
 
@@ -36,10 +38,41 @@ El script `bbdd.sql` crea la base de datos `hh_db` con las siguientes tablas:
 - `roles` - Roles de usuario (Admin, Vendedor, Cliente)
 - `categorias` - Categorías de productos con prefijos automáticos
 - `usuarios` - Usuarios del sistema
-- `productos` - Catálogo de productos
+- `productos` - Catálogo de productos con `imagen_url` apuntando a Cloudinary
 - `ordenes` y `ordenes_productos` - Gestión de pedidos
 
-### 2. Configurar Conexión
+### 2. Configurar Cloudinary (Obligatorio)
+
+El proyecto usa **Cloudinary** como CDN para almacenar imágenes de productos. Sigue estos pasos:
+
+1. **Crear cuenta gratuita en Cloudinary**:
+   - Visita https://cloudinary.com
+   - Crea una cuenta gratuita (25GB storage/bandwidth)
+   
+2. **Obtener credenciales**:
+   - En el Dashboard, copia: **Cloud Name**, **API Key**, **API Secret**
+
+3. **Configurar credenciales locales**:
+   ```bash
+   # Copia el archivo template
+   cp src/main/resources/application-local.properties.template src/main/resources/application-local.properties
+   
+   # Edita application-local.properties con tus credenciales reales
+   ```
+
+4. **Editar `application-local.properties`** (este archivo está en `.gitignore`, NUNCA se sube a GitHub):
+   ```properties
+   cloudinary.cloud-name=tu_cloud_name
+   cloudinary.api-key=tu_api_key
+   cloudinary.api-secret=tu_api_secret
+   ```
+
+⚠️ **IMPORTANTE**: 
+- `application-local.properties` contiene credenciales REALES y está gitignoreado.
+- `application-local.properties.template` es solo una plantilla segura para commits.
+- NUNCA commitees `application-local.properties` ni expongas tus credenciales.
+
+### 3. Configurar Conexión MySQL
 
 Edita `src/main/resources/application.properties`:
 
@@ -49,11 +82,15 @@ spring.datasource.username=tu_usuario
 spring.datasource.password=tu_contraseña
 ```
 
-### 3. Instalar Dependencias
+### 4. Instalar Dependencias
 
 ```bash
 ./mvnw clean install
 ```
+
+Si los tests fallan, verifica que:
+- MySQL esté ejecutándose y la base de datos `hh_db` exista
+- `application-local.properties` tenga credenciales de Cloudinary válidas
 
 ## Ejecución
 
@@ -101,6 +138,7 @@ http://localhost:8080/swagger-ui/index.html
 - `GET /api/productos` - Listar productos activos
 - `GET /api/productos/{id}` - Obtener producto por ID
 - `POST /api/productos` - Crear producto (ADMIN)
+- `POST /api/productos/{id}/imagen` - Subir imagen a Cloudinary (ADMIN)
 - `PUT /api/productos/{id}` - Actualizar producto (ADMIN)
 - `DELETE /api/productos/{id}` - Borrado lógico (ADMIN)
 
@@ -167,6 +205,55 @@ http://localhost:3000 (frontend React)
 
 Métodos permitidos: GET, POST, PUT, DELETE, OPTIONS
 
+## Cloudinary - Gestión de Imágenes
+
+### ¿Por qué Cloudinary?
+
+El backend usa **Cloudinary** como CDN externo para almacenar imágenes de productos por las siguientes razones:
+- ✅ **Hosting externo**: Las imágenes no se guardan en la base de datos ni en el servidor
+- ✅ **CDN global**: Entrega rápida desde servidores distribuidos globalmente
+- ✅ **Optimización automática**: Compresión y redimensionamiento de imágenes
+- ✅ **Plan gratuito**: 25GB storage y 25GB bandwidth/mes
+- ✅ **URLs públicas**: Accesibles desde cualquier cliente (Android, Web, iOS)
+
+### Cómo funciona
+
+1. **Upload de imagen**: 
+   ```
+   POST /api/productos/{id}/imagen
+   Content-Type: multipart/form-data
+   Body: file=imagen.jpg
+   ```
+   - El archivo se sube a Cloudinary
+   - Se obtiene una URL pública (ej: `https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222680/manzana_boxrpo.jpg`)
+   - La URL se guarda en la columna `imagen_url` de la tabla `productos`
+
+2. **Obtención de imagen**:
+   - El endpoint `GET /api/productos` devuelve el campo `imagenUrl`
+   - El cliente Android usa Coil para cargar la imagen desde la URL
+
+3. **Seguridad**:
+   - Las credenciales están en `application-local.properties` (gitignored)
+   - Los tests usan credenciales mock en `src/test/resources/application.properties`
+
+### Ejemplo de Response
+
+```json
+{
+  "id": 1,
+  "nombre": "Manzana Fuji",
+  "descripcion": "Manzanas frescas importadas...",
+  "precio": 2500,
+  "stock": 100,
+  "imagenUrl": "https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222680/manzana_boxrpo.jpg",
+  "activo": true,
+  "categoria": {
+    "id": 1,
+    "nombre": "Frutas frescas"
+  }
+}
+```
+
 ## Datos de Prueba
 
 El script `bbdd.sql` incluye datos iniciales:
@@ -183,6 +270,10 @@ cliente@duocuc.cl / cliente123 (CLIENTE)
 - Verduras orgánicas (VR)
 - Productos orgánicos (PO)
 - Productos lácteos (PL)
+
+**Productos:**
+- 10 productos con imágenes reales alojadas en Cloudinary
+- Todas las URLs de imágenes apuntan a `https://res.cloudinary.com/dg7dcbcjn/...`
 
 ## Scripts Maven
 
