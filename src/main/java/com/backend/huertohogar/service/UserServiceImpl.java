@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
         user.setComentario(userDto.getComentario());
         user.setRol(rol);
         user.setFechaRegistro(LocalDateTime.now());
-        user.setFotoPerfil(userDto.getFotoPerfil());
+        user.setFotoPerfilUrl(userDto.getFotoPerfil()); // DTO still uses fotoPerfil
         user.setActivo(true); // New users are active by default
 
         User savedUser = userRepository.save(user);
@@ -204,7 +204,7 @@ public class UserServiceImpl implements UserService {
         existingUser.setDireccion(userDto.getDireccion());
         existingUser.setComentario(userDto.getComentario());
         existingUser.setRol(rol);
-        existingUser.setFotoPerfil(userDto.getFotoPerfil());
+        existingUser.setFotoPerfilUrl(userDto.getFotoPerfil()); // DTO still uses fotoPerfil
 
         User updatedUser = userRepository.save(existingUser);
         return new UserResponseDTO(updatedUser);
@@ -241,5 +241,14 @@ public class UserServiceImpl implements UserService {
         return user.getId();
     }
 
+    @Override
+    public UserResponseDTO updateProfileImage(Integer id, String imageUrl) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
+        
+        user.setFotoPerfilUrl(imageUrl);
+        User updatedUser = userRepository.save(user);
+        return new UserResponseDTO(updatedUser);
+    }
 
 }

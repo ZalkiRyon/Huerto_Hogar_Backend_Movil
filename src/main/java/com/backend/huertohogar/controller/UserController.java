@@ -1,5 +1,6 @@
 package com.backend.huertohogar.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,12 +16,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.backend.huertohogar.dto.UserRequestDTO;
 import com.backend.huertohogar.dto.UserResponseDTO;
 import com.backend.huertohogar.model.User;
 import com.backend.huertohogar.repository.UserRepository;
+import com.backend.huertohogar.service.CloudinaryService;
 import com.backend.huertohogar.service.UserService;
 
 @RestController
@@ -30,11 +34,13 @@ public class UserController {
 
     private final UserService userService;
     private final UserRepository userRepository;
+    private final CloudinaryService cloudinaryService;
 
     @Autowired
-    public UserController(UserService userService, UserRepository userRepository) {
+    public UserController(UserService userService, UserRepository userRepository, CloudinaryService cloudinaryService) {
         this.userService = userService;
         this.userRepository = userRepository;
+        this.cloudinaryService = cloudinaryService;
     }
 
     @GetMapping
@@ -195,5 +201,59 @@ public class UserController {
     public ResponseEntity<Void> reactivateUser(@PathVariable Integer id) {
         userService.reactivateUser(id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
+    /**
+     * Sube imagen de perfil de usuario a Cloudinary
+     * POST /api/usuarios/{id}/foto-perfil
+     * @param id ID del usuario
+     * @param file Archivo de imagen (MultipartFile)
+     * @return Usuario actualizado con URL de Cloudinary
+     */
+    @PostMapping("/{id}/foto-perfil")
+    public ResponseEntity<Map<String, Object>> uploadProfileImage(
+            @PathVariable Integer id,
+            @RequestParam("file") MultipartFile file) {
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            // Validar que el archivo no esté vacío
+            if (file.isEmpty()) {
+                response.put("message", "El archivo está vacío");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+            
+            // Validar tipo de archivo
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                response.put("message", "El archivo debe ser una imagen");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+            
+            // Subir imagen a Cloudinary (carpeta "huerto_hogar/profiles")
+            String imageUrl = cloudinaryService.uploadImage(file, "huerto_hogar/profiles");
+            
+            // Actualizar usuario con la nueva URL
+            UserResponseDTO updatedUser = userService.updateProfileImage(id, imageUrl);
+            
+            response.put("message", "Foto de perfil actualizada exitosamente");
+            response.put("user", updatedUser);
+            response.put("imageUrl", imageUrl);
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
+            
+        } catch (IllegalArgumentException e) {
+            response.put("message", e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            
+        } catch (IOException e) {
+            response.put("message", "Error al subir la imagen: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            
+        } catch (Exception e) {
+            response.put("message", "Error inesperado: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

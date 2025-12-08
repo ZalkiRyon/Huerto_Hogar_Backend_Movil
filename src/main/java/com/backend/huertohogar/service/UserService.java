@@ -22,4 +22,6 @@ public interface UserService {
     UserResponseDTO updateUser(Integer id, UserRequestDTO user);
 
     Integer findIdByEmail(String email);
+    
+    UserResponseDTO updateProfileImage(Integer id, String imageUrl);
 }

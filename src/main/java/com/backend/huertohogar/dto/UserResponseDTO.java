@@ -17,7 +17,7 @@ public class UserResponseDTO {
     private String direccion;
     private String comentario;
     private LocalDateTime fechaRegistro;
-    private String fotoPerfil;
+    private String fotoPerfilUrl;
     private Boolean activo;
 
     private String roleNombre;
@@ -35,7 +35,7 @@ public class UserResponseDTO {
         this.direccion = user.getDireccion();
         this.comentario = user.getComentario();
         this.fechaRegistro = user.getFechaRegistro();
-        this.fotoPerfil = user.getFotoPerfil();
+        this.fotoPerfilUrl = user.getFotoPerfilUrl();
         this.activo = user.getActivo();
 
         if (user.getRol() != null) {
@@ -147,12 +147,12 @@ public class UserResponseDTO {
         this.roleNombre = roleNombre;
     }
 
-    public String getFotoPerfil() {
-        return fotoPerfil;
+    public String getFotoPerfilUrl() {
+        return fotoPerfilUrl;
     }
 
-    public void setFotoPerfil(String fotoPerfil) {
-        this.fotoPerfil = fotoPerfil;
+    public void setFotoPerfilUrl(String fotoPerfilUrl) {
+        this.fotoPerfilUrl = fotoPerfilUrl;
     }
 
     public Boolean getActivo() {

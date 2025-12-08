@@ -53,8 +53,8 @@ public class User {
     @Column(nullable = false, name = "fecha_registro")
     private LocalDateTime fechaRegistro;
 
-    @Column(name = "fotoPerfil", length = 255)
-    private String fotoPerfil;
+    @Column(name = "foto_perfil_url", length = 500)
+    private String fotoPerfilUrl;
 
     @Column(nullable = false)
     private Boolean activo = true;
@@ -170,12 +170,12 @@ public class User {
         this.rol = rol;
     }
 
-    public String getFotoPerfil() {
-        return fotoPerfil;
+    public String getFotoPerfilUrl() {
+        return fotoPerfilUrl;
     }
 
-    public void setFotoPerfil(String fotoPerfil) {
-        this.fotoPerfil = fotoPerfil;
+    public void setFotoPerfilUrl(String fotoPerfilUrl) {
+        this.fotoPerfilUrl = fotoPerfilUrl;
     }
 
     public Boolean getActivo() {
