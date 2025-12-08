@@ -9,7 +9,8 @@ public class ProductoResponseDTO {
     private Integer precio;
     private Integer stock;
     private String descripcion;
-    private String imagen;
+    private String imagen; // DEPRECATED: Legacy field
+    private String imagenUrl; // Cloudinary URL
     private Boolean activo;
 
     public ProductoResponseDTO() {
@@ -23,6 +24,7 @@ public class ProductoResponseDTO {
         this.stock = producto.getStock();
         this.descripcion = producto.getDescripcion();
         this.imagen = producto.getImagen();
+        this.imagenUrl = producto.getImagenUrl();
         this.activo = producto.getActivo();
     }
 
@@ -80,6 +82,14 @@ public class ProductoResponseDTO {
 
     public void setImagen(String imagen) {
         this.imagen = imagen;
+    }
+
+    public String getImagenUrl() {
+        return imagenUrl;
+    }
+
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
     }
 
     public Boolean getActivo() {

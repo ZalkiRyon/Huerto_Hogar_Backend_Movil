@@ -107,7 +107,8 @@ CREATE TABLE `usuarios` (
   `region` varchar(100) DEFAULT NULL,
   `comuna` varchar(100) DEFAULT NULL,
   `direccion` varchar(255) DEFAULT NULL,
-  `fotoPerfil` varchar(255) DEFAULT NULL,
+  `fotoPerfil` varchar(255) DEFAULT NULL, -- DEPRECATED: Nombre del archivo (legacy)
+  `foto_perfil_url` varchar(500) DEFAULT NULL, -- URL de Cloudinary para foto de perfil
   `comentario` text,
   `fecha_registro` datetime DEFAULT CURRENT_TIMESTAMP,
   `activo` BOOLEAN NOT NULL DEFAULT TRUE, -- Soft delete: TRUE = activo, FALSE = eliminado
@@ -127,7 +128,8 @@ CREATE TABLE `productos` (
   `precio` int(11) NOT NULL DEFAULT 0,
   `stock` int(11) NOT NULL DEFAULT 0,
   `descripcion` text,
-  `imagen` varchar(255) DEFAULT NULL,
+  `imagen` varchar(255) DEFAULT NULL, -- DEPRECATED: Nombre del archivo (legacy)
+  `imagen_url` varchar(500) DEFAULT NULL, -- URL de Cloudinary (https://res.cloudinary.com/...)
   `activo` BOOLEAN NOT NULL DEFAULT TRUE,
   PRIMARY KEY (`id`),
   UNIQUE KEY `nombre_producto_unique` (`nombre`), -- Validación de unicidad para Nombre Producto

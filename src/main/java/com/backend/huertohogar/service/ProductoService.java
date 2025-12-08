@@ -24,4 +24,6 @@ public interface ProductoService {
     Optional<String> getProductNameById(Integer id);
 
     void reactivateProducto(Integer id);
+
+    void updateProductImage(Integer id, String imageUrl);
 }
