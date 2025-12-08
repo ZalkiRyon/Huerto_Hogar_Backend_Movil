@@ -67,10 +67,17 @@ El proyecto usa **Cloudinary** como CDN para almacenar imágenes de productos. S
    cloudinary.api-secret=tu_api_secret
    ```
 
+5. **Verificar profile activo**: El archivo `application.properties` ya tiene configurado:
+   ```properties
+   spring.profiles.active=local
+   ```
+   Esto carga automáticamente `application-local.properties` con tus credenciales.
+
 ⚠️ **IMPORTANTE**: 
 - `application-local.properties` contiene credenciales REALES y está gitignoreado.
 - `application-local.properties.template` es solo una plantilla segura para commits.
 - NUNCA commitees `application-local.properties` ni expongas tus credenciales.
+- El profile `local` debe estar activo para cargar las credenciales.
 
 ### 3. Configurar Conexión MySQL
 
@@ -82,15 +89,23 @@ spring.datasource.username=tu_usuario
 spring.datasource.password=tu_contraseña
 ```
 
-### 4. Instalar Dependencias
+### 4. Instalar Dependencias y Ejecutar
 
 ```bash
+# Compilar y ejecutar tests
 ./mvnw clean install
+
+# Ejecutar servidor
+./mvnw spring-boot:run
 ```
 
-Si los tests fallan, verifica que:
-- MySQL esté ejecutándose y la base de datos `hh_db` exista
-- `application-local.properties` tenga credenciales de Cloudinary válidas
+El servidor iniciará en `http://localhost:8080`
+
+**Si los tests o el servidor fallan**, verifica que:
+- MySQL esté ejecutándose en `localhost:3306`
+- La base de datos `hh_db` exista
+- `application-local.properties` exista con credenciales de Cloudinary válidas
+- El profile `local` esté activo en `application.properties`
 
 ## Ejecución
 
