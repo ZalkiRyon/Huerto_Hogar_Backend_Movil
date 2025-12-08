@@ -16,10 +16,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.backend.huertohogar.dto.ProductoRequestDTO;
 import com.backend.huertohogar.dto.ProductoResponseDTO;
+import com.backend.huertohogar.service.CloudinaryService;
 import com.backend.huertohogar.service.ProductoService;
 
 import jakarta.validation.Valid;
@@ -30,10 +33,12 @@ import jakarta.validation.Valid;
 public class ProductoController {
 
     private final ProductoService productoService;
+    private final CloudinaryService cloudinaryService;
 
     @Autowired
-    public ProductoController(ProductoService productoService) {
+    public ProductoController(ProductoService productoService, CloudinaryService cloudinaryService) {
         this.productoService = productoService;
+        this.cloudinaryService = cloudinaryService;
     }
 
     @GetMapping
@@ -107,5 +112,33 @@ public class ProductoController {
                 // code 200
                 .orElseGet(() -> new ResponseEntity<>("Producto no encontrado", HttpStatus.NOT_FOUND));
                 // code 404
+    }
+
+    /**
+     * Sube una imagen a Cloudinary y la asocia al producto.
+     * Endpoint: POST /api/productos/{id}/imagen
+     * 
+     * @param id ID del producto
+     * @param file Imagen a subir (multipart/form-data)
+     * @return URL de la imagen subida
+     */
+    @PostMapping("/{id}/imagen")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> uploadProductImage(
+            @PathVariable Integer id,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            // Subir imagen a Cloudinary
+            String imageUrl = cloudinaryService.uploadImage(file, "productos");
+            
+            // Actualizar producto con la URL
+            productoService.updateProductImage(id, imageUrl);
+            
+            return new ResponseEntity<>(imageUrl, HttpStatus.OK);
+            // code 200
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al subir imagen: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            // code 500
+        }
     }
 }

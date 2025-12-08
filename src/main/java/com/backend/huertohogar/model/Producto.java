@@ -27,7 +27,10 @@ public class Producto {
     private String descripcion;
 
     @Column(length = 255)
-    private String imagen;
+    private String imagen; // DEPRECATED: Legacy field for local images
+
+    @Column(name = "imagen_url", length = 500)
+    private String imagenUrl; // Cloudinary URL (https://res.cloudinary.com/...)
 
     @Column(nullable = false)
     private Boolean activo = true;
@@ -97,5 +100,13 @@ public class Producto {
 
     public void setImagen(String imagen) {
         this.imagen = imagen;
+    }
+
+    public String getImagenUrl() {
+        return imagenUrl;
+    }
+
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
     }
 }

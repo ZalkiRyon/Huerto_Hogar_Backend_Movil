@@ -247,5 +247,15 @@ public class ProductoServiceImpl implements ProductoService {
         producto.setActivo(false);
         productoRepository.save(producto);
     }
+
+    @Override
+    @Transactional
+    public void updateProductImage(Integer id, String imageUrl) {
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con ID: " + id));
+        
+        producto.setImagenUrl(imageUrl);
+        productoRepository.save(producto);
+    }
 }
 
