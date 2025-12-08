@@ -210,9 +210,14 @@ public class UserController {
      * @param file Archivo de imagen (MultipartFile)
      * @return Usuario actualizado con URL de Cloudinary
      */
-    @PostMapping("/{id}/foto-perfil")
+    @io.swagger.v3.oas.annotations.Operation(
+        summary = "Subir foto de perfil",
+        description = "Sube una imagen de perfil a Cloudinary y actualiza el usuario con la URL"
+    )
+    @PostMapping(value = "/{id}/foto-perfil", consumes = "multipart/form-data")
     public ResponseEntity<Map<String, Object>> uploadProfileImage(
             @PathVariable Integer id,
+            @io.swagger.v3.oas.annotations.Parameter(description = "Archivo de imagen JPG/PNG", required = true)
             @RequestParam("file") MultipartFile file) {
         
         Map<String, Object> response = new HashMap<>();
