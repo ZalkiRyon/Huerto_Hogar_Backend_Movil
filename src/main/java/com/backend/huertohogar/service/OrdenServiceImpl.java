@@ -1,22 +1,28 @@
 package com.backend.huertohogar.service;
 
-import com.backend.huertohogar.dto.DetalleOrdenRequestDTO;
-import com.backend.huertohogar.dto.OrdenRequestDTO;
-import com.backend.huertohogar.dto.OrdenResponseDTO;
-import com.backend.huertohogar.exception.ResourceNotFoundException;
-import com.backend.huertohogar.exception.ValidationException;
-import com.backend.huertohogar.model.*;
-import com.backend.huertohogar.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.backend.huertohogar.dto.DetalleOrdenRequestDTO;
+import com.backend.huertohogar.dto.OrdenRequestDTO;
+import com.backend.huertohogar.dto.OrdenResponseDTO;
+import com.backend.huertohogar.exception.ResourceNotFoundException;
+import com.backend.huertohogar.model.DetalleOrden;
+import com.backend.huertohogar.model.Estado;
+import com.backend.huertohogar.model.Orden;
+import com.backend.huertohogar.model.Producto;
+import com.backend.huertohogar.model.User;
+import com.backend.huertohogar.repository.EstadoRepository;
+import com.backend.huertohogar.repository.OrdenRepository;
+import com.backend.huertohogar.repository.ProductoRepository;
+import com.backend.huertohogar.repository.UserRepository;
 
 @Service
 public class OrdenServiceImpl implements OrdenService {
@@ -94,20 +100,15 @@ public class OrdenServiceImpl implements OrdenService {
         }
 
         // 5. Asignar Estado
-        java.util.Random random = new java.util.Random();
         Estado estadoOrden;
         if (stockInsuficiente) {
-            // Buscar estado "Cancelado" (ID 3)
+            // Stock insuficiente -> Cancelado (ID 3)
             estadoOrden = estadoRepository.findById(3)
                     .orElseThrow(() -> new ResourceNotFoundException("Estado 'Cancelado' no encontrado."));
         } else {
-            // Asignar estado aleatorio entre Enviado (1), Pendiente (2), Procesando (4)
-            // Excluyendo Cancelado (3)
-            int[] estadosValidos = { 1, 2, 4 };
-            int randomEstadoId = estadosValidos[random.nextInt(estadosValidos.length)];
-            estadoOrden = estadoRepository.findById(randomEstadoId)
-                    .orElseThrow(
-                            () -> new ResourceNotFoundException("Estado con ID " + randomEstadoId + " no encontrado"));
+            // Stock suficiente -> Enviado (ID 1)
+            estadoOrden = estadoRepository.findById(1)
+                    .orElseThrow(() -> new ResourceNotFoundException("Estado 'Enviado' no encontrado."));
         }
         orden.setEstado(estadoOrden);
 
