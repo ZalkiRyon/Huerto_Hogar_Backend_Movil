@@ -1,0 +1,24 @@
+# ================================================================
+# LOCAL CONFIGURATION TEMPLATE
+# ================================================================
+# Copy this file to: application-local.properties
+# Fill with your actual Cloudinary credentials
+# DO NOT COMMIT application-local.properties to Git (it's in .gitignore)
+# ================================================================
+
+# Cloudinary Credentials (External API for Image Hosting)
+# Get these from: https://console.cloudinary.com/settings/account
+cloudinary.cloud-name=YOUR_CLOUD_NAME_HERE
+cloudinary.api-key=YOUR_API_KEY_HERE
+cloudinary.api-secret=YOUR_API_SECRET_HERE
+
+# ================================================================
+# INSTRUCTIONS:
+# ================================================================
+# 1. Copy this file: cp application-local.properties.template application-local.properties
+# 2. Contact project owner to get actual credentials
+# 3. Fill the values above with real credentials
+# 4. Run the application with: ./mvnw spring-boot:run -Dspring.profiles.active=local
+# 
+# The application-local.properties file is gitignored and will NOT be committed.
+# ================================================================
