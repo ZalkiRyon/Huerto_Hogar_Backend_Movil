@@ -37,3 +37,9 @@ Front/
 
 #docs referenciales
 docs/
+
+# Environment variables with sensitive data
+.env
+.env.local
+.env.production
+**/application-local.properties
