@@ -11,6 +11,8 @@ public interface ProductoService {
 
     List<ProductoResponseDTO> getAllProductosIncludingInactive();
 
+    List<ProductoResponseDTO> getProductosByCategory(String category);
+
     Optional<ProductoResponseDTO> getProductoById(Integer id);
 
     ProductoResponseDTO saveProducto(ProductoRequestDTO productoDTO);

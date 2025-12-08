@@ -60,6 +60,13 @@ public class ProductoController {
         // code 404
     }
 
+    @GetMapping("/category/{category}")
+    public ResponseEntity<List<ProductoResponseDTO>> getProductosByCategory(@PathVariable String category) {
+        List<ProductoResponseDTO> productos = productoService.getProductosByCategory(category);
+        return new ResponseEntity<>(productos, HttpStatus.OK);
+        // code 200
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductoResponseDTO> createProducto(@Valid @RequestBody ProductoRequestDTO productoDTO) {
