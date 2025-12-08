@@ -240,18 +240,18 @@ INSERT INTO `usuarios` (`id`, `email`, `password`, `role_id`, `nombre`, `apellid
 (18, 'andres.munoz@duocuc.cl', 'cliente109', 2, 'Andrés Felipe', 'Muñoz Bravo', '12.789.345-6', '989012345', 'region-valparaiso', 'quilpue', 'Calle Freire 123, Villa Esperanza', 'Cliente fiel', '2024-05-10 10:20:00', null, TRUE),
 (19, 'daniela.castro@duocuc.cl', 'cliente110', 2, 'Daniela Patricia', 'Castro Fuentes', '21.890.456-8', '945678903', 'region-biobio', 'los-angeles', 'Av. Ricardo Vicuña 456', 'Cliente semanal', '2024-05-15 12:40:00', null, TRUE);
 
--- Insertar Productos
-INSERT INTO `productos` (`id`, `nombre`, `categoria_id`, `precio`, `stock`, `descripcion`, `imagen`, `activo`) VALUES
-(1, 'FR001 - Manzanas Fuji', 1, 1200, 150, 'Manzanas Fuji crujientes y dulces, cultivadas en el Valle del Maule.', 'manzana.jpg', TRUE),
-(2, 'FR002 - Naranjas Valencia', 1, 1000, 200, 'Jugosas y ricas en vitamina C, ideales para zumos frescos.', 'naranja.jpg', TRUE),
-(3, 'FR003 - Plátanos Cavendish', 1, 800, 250, 'Plátanos maduros y dulces, perfectos para el desayuno.', 'platano.jpg', TRUE),
-(4, 'VR001 - Zanahorias Organicas', 2, 900, 100, 'Zanahorias crujientes cultivadas sin pesticidas.', 'zanahoria.jpg', TRUE),
-(5, 'VR002 - Espinacas Frescas', 2, 700, 80, 'Espinacas frescas y nutritivas, perfectas para ensaladas.', 'espinaca.jpg', TRUE),
-(6, 'VR003 - Pimentones Tricolores', 2, 1500, 120, 'Pimientos rojos, amarillos y verdes, ideales para salteados.', 'pimenton.jpg', TRUE),
-(7, 'PO001 - Miel Organica', 3, 5000, 50, 'Miel pura y orgánica producida por apicultores locales.', 'miel.jpg', TRUE),
-(8, 'PO002 - Quinua Organica', 3, 3000, 70, 'Grano andino altamente nutritivo, ideal para ensaladas.', 'quinoa.jpg', TRUE),
-(9, 'PL001 - Leche Entera', 4, 1200, 100, 'Leche fresca y pasteurizada, rica en calcio y vitaminas.', 'leche.jpg', TRUE),
-(10, 'PL002 - Queso de cabra', 4, 5000, 100, 'Queso de cabra, alta en proteinas y calcio, contiene bajos niveles de grasaa saturadas.', 'queso.jpg', TRUE);
+-- Insertar Productos (con URLs de Cloudinary)
+INSERT INTO `productos` (`id`, `nombre`, `categoria_id`, `precio`, `stock`, `descripcion`, `imagen`, `imagen_url`, `activo`) VALUES
+(1, 'FR001 - Manzanas Fuji', 1, 1200, 150, 'Manzanas Fuji crujientes y dulces, cultivadas en el Valle del Maule.', 'manzana.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222680/manzana_boxrpo.jpg', TRUE),
+(2, 'FR002 - Naranjas Valencia', 1, 1000, 200, 'Jugosas y ricas en vitamina C, ideales para zumos frescos.', 'naranja.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222703/naranja_hvglex.jpg', TRUE),
+(3, 'FR003 - Plátanos Cavendish', 1, 800, 250, 'Plátanos maduros y dulces, perfectos para el desayuno.', 'platano.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222717/platano_lcha8m.jpg', TRUE),
+(4, 'VR001 - Zanahorias Organicas', 2, 900, 100, 'Zanahorias crujientes cultivadas sin pesticidas.', 'zanahoria.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222756/zanahoria_zgkxdz.jpg', TRUE),
+(5, 'VR002 - Espinacas Frescas', 2, 700, 80, 'Espinacas frescas y nutritivas, perfectas para ensaladas.', 'espinaca.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222611/espinaca_vpnnbp.jpg', TRUE),
+(6, 'VR003 - Pimentones Tricolores', 2, 1500, 120, 'Pimientos rojos, amarillos y verdes, ideales para salteados.', 'pimenton.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222710/pimenton_qpk7hr.jpg', TRUE),
+(7, 'PO001 - Miel Organica', 3, 5000, 50, 'Miel pura y orgánica producida por apicultores locales.', 'miel.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222688/miel_iyz7je.jpg', TRUE),
+(8, 'PO002 - Quinua Organica', 3, 3000, 70, 'Grano andino altamente nutritivo, ideal para ensaladas.', 'quinoa.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222729/quinoa_d3yhon.jpg', TRUE),
+(9, 'PL001 - Leche Entera', 4, 1200, 100, 'Leche fresca y pasteurizada, rica en calcio y vitaminas.', 'leche.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222671/leche_zw9npe.jpg', TRUE),
+(10, 'PL002 - Queso de cabra', 4, 5000, 100, 'Queso de cabra, alta en proteinas y calcio, contiene bajos niveles de grasaa saturadas.', 'queso.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765223606/queso_gkxdkd.jpg', TRUE);
 
 -- Insertar Órdenes (CORREGIDO CON SNAPSHOTS Y CAMPOS DE DESPACHO)
 -- Nota: Se han extraído los datos de los usuarios correspondientes para llenar los snapshots.
