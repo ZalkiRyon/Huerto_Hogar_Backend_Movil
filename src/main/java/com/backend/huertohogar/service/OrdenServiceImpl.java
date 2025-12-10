@@ -145,7 +145,7 @@ public class OrdenServiceImpl implements OrdenService {
         orden.setDetalles(detalles);
         
         // 7. Costo de envío aleatorio
-        int costoEnvio = generarCostoEnvioAleatorio();
+        int costoEnvio = generarCostoEnvioFijo();
         orden.setCostoEnvio(costoEnvio);
         
         // 8. Calcular monto total = subtotal productos + costo envío
@@ -181,11 +181,8 @@ public class OrdenServiceImpl implements OrdenService {
         return "SO" + (ultimoNumero + 1);
     }
 
-    private int generarCostoEnvioAleatorio() {
-        java.util.Random random = new java.util.Random();
-        int min = 3000;
-        int max = 7000;
-        return random.nextInt(max - min + 1) + min;
+    private int generarCostoEnvioFijo() {
+        return 3000;
     }
 
     @Override
@@ -222,8 +219,7 @@ public class OrdenServiceImpl implements OrdenService {
 
     @Override
     public int calcularCostoEnvio(String region, String comuna) {
-        // Genera un costo de envío aleatorio entre 3000 y 7000
-        // Puedes personalizar esta lógica según la región/comuna si lo deseas
-        return generarCostoEnvioAleatorio();
+        // Costo fijo de envío
+        return generarCostoEnvioFijo();
     }
 }
