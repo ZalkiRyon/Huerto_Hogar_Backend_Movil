@@ -134,7 +134,8 @@ public class ProductoController {
             // Actualizar producto con la URL
             productoService.updateProductImage(id, imageUrl);
             
-            return new ResponseEntity<>(imageUrl, HttpStatus.OK);
+            // Devolver como JSON con comillas
+            return ResponseEntity.ok().body("\"" + imageUrl + "\"");
             // code 200
         } catch (Exception e) {
             return new ResponseEntity<>("Error al subir imagen: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

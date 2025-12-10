@@ -107,7 +107,6 @@ CREATE TABLE `usuarios` (
   `region` varchar(100) DEFAULT NULL,
   `comuna` varchar(100) DEFAULT NULL,
   `direccion` varchar(255) DEFAULT NULL,
-  `fotoPerfil` varchar(255) DEFAULT NULL, -- DEPRECATED: Nombre del archivo (legacy)
   `foto_perfil_url` varchar(500) DEFAULT NULL, -- URL de Cloudinary para foto de perfil
   `comentario` text,
   `fecha_registro` datetime DEFAULT CURRENT_TIMESTAMP,
@@ -128,7 +127,6 @@ CREATE TABLE `productos` (
   `precio` int(11) NOT NULL DEFAULT 0,
   `stock` int(11) NOT NULL DEFAULT 0,
   `descripcion` text,
-  `imagen` varchar(255) DEFAULT NULL, -- DEPRECATED: Nombre del archivo (legacy)
   `imagen_url` varchar(500) DEFAULT NULL, -- URL de Cloudinary (https://res.cloudinary.com/...)
   `activo` BOOLEAN NOT NULL DEFAULT TRUE,
   PRIMARY KEY (`id`),
@@ -219,39 +217,39 @@ INSERT INTO `estados` (`id`, `nombre`) VALUES
 (1, 'Enviado'), (2, 'Pendiente'), (3, 'Cancelado'), (4, 'Procesando');
 
 -- Insertar Usuarios (con campo activo por defecto TRUE)
-INSERT INTO `usuarios` (`id`, `email`, `password`, `role_id`, `nombre`, `apellido`, `run`, `telefono`, `region`, `comuna`, `direccion`, `comentario`, `fecha_registro`, `fotoPerfil`, `activo`) VALUES
-(1, 'admin@duocuc.cl', 'admin123', 1, 'Super', 'Administrador', '12.345.678-9', '912345678', 'region-metropolitana', 'santiago', 'Av. Providencia 1234, Oficina 501', 'Admin sistema', '2024-01-15 08:00:00', null, TRUE),
-(2, 'maria.gonzalez@duocuc.cl', 'admin456', 1, 'María José', 'González Pérez', '15.678.234-5', '987654321', 'region-valparaiso', 'valparaiso', 'Calle Esmeralda 789, Casa 12', 'Admin DB', '2024-02-10 09:30:00', null, TRUE),
-(3, 'carlos.torres@profesor.duoc.cl', 'admin789', 1, 'Carlos Eduardo', 'Torres Silva', '18.234.567-8', '956789123', 'region-biobio', 'concepcion', 'Av. O''Higgins 2456, Depto 34B', 'Admin académico', '2024-01-25 14:15:00', null, TRUE),
-(4, 'ana.martinez@duocuc.cl', 'cliente123', 2, 'Ana María', 'Martínez López', '19.876.543-2', '945678912', 'region-metropolitana', 'las-condes', 'Av. Apoquindo 4567, Casa 78', 'Cliente VIP', '2024-03-05 10:20:00', null, TRUE),
-(5, 'pedro.ramirez@duocuc.cl', 'cliente456', 2, 'Pedro Antonio', 'Ramírez Castro', '16.789.123-4', '934567891', 'region-ohiggins', 'rancagua', 'Calle San Martín 1234, Villa El Sauce', 'Cliente frecuente', '2024-02-28 16:45:00', null, TRUE),
-(6, 'lucia.fernandez@duocuc.cl', 'cliente789', 2, 'Lucía Elena', 'Fernández Morales', '21.456.789-1', '923456789', 'region-araucania', 'temuco', 'Pasaje Los Aromos 567, Población Nueva', 'Estudiante DUOC', '2024-03-12 11:30:00', null, TRUE),
-(7, 'rodrigo.silva@duocuc.cl', 'vendedor123', 3, 'Rodrigo Alejandro', 'Silva Mendoza', '17.345.678-9', '967891234', 'region-metropolitana', 'maipu', 'Av. Pajaritos 3456, Block 12, Depto 204', 'Vendedor frutas', '2024-02-15 08:45:00', null, TRUE),
-(8, 'sofia.herrera@duocuc.cl', 'vendedor456', 3, 'Sofía Alejandra', 'Herrera Vásquez', '20.123.456-7', '956781234', 'region-maule', 'talca', 'Calle 1 Norte 2345, Villa Los Jardines', 'Vendedora lácteos', '2024-01-30 13:20:00', null, TRUE),
-(9, 'miguel.rojas@profesor.duoc.cl', 'vendedor789', 3, 'Miguel Ángel', 'Rojas Contreras', '14.567.890-1', '912347856', 'region-valparaiso', 'vina-del-mar', 'Av. Libertad 1789, Casa 45', 'Vendedor verduras', '2024-02-05 15:10:00', null, TRUE),
-(10, 'juan.perez@duocuc.cl', 'cliente101', 2, 'Juan Carlos', 'Pérez Soto', '13.234.567-8', '956789012', 'region-metropolitana', 'providencia', 'Av. Providencia 2345, Depto 12', 'Cliente orgánico', '2024-04-01 10:00:00', null, TRUE),
-(11, 'carla.lopez@duocuc.cl', 'cliente102', 2, 'Carla Andrea', 'López Muñoz', '17.890.123-4', '945678901', 'region-valparaiso', 'vina-del-mar', 'Calle Alvares 567, Casa 23', 'Cliente semanal', '2024-04-05 14:30:00', null, TRUE),
-(12, 'roberto.sanchez@duocuc.cl', 'cliente103', 2, 'Roberto Andrés', 'Sánchez Vera', '14.567.234-9', '912345678', 'region-biobio', 'talcahuano', 'Pasaje Los Pinos 890, Villa Mar', 'Cliente VIP', '2024-04-10 09:15:00', null, TRUE),
-(13, 'maria.silva@duocuc.cl', 'cliente104', 2, 'María Cristina', 'Silva Rojas', '16.345.678-2', '967890123', 'region-maule', 'curico', 'Av. Manso de Velasco 1234', 'Cliente lácteos', '2024-04-15 16:20:00', null, TRUE),
-(14, 'diego.morales@duocuc.cl', 'cliente105', 2, 'Diego Sebastián', 'Morales Castro', '19.123.456-7', '923456780', 'region-metropolitana', 'la-florida', 'Calle Walker Martinez 3456, Block A', 'Cliente eventos', '2024-04-20 11:45:00', null, TRUE),
-(15, 'valentina.rojas@duocuc.cl', 'cliente106', 2, 'Valentina Isabel', 'Rojas Hernández', '20.234.567-1', '934567892', 'region-ohiggins', 'san-fernando', 'Av. Libertador 789, Casa 45', 'Cliente regular', '2024-04-25 13:10:00', null, TRUE),
-(16, 'francisco.gomez@duocuc.cl', 'cliente107', 2, 'Francisco Javier', 'Gómez Torres', '15.890.234-5', '978901234', 'region-araucania', 'villarrica', 'Camino Villarrica 234, Km 5', 'Cliente certificado', '2024-05-01 08:30:00', null, TRUE),
-(17, 'camila.vargas@duocuc.cl', 'cliente108', 2, 'Camila Fernanda', 'Vargas Pérez', '18.456.789-3', '956781235', 'region-metropolitana', 'nunoa', 'Av. Irarrázaval 5678, Depto 301', 'Cliente familia', '2024-05-05 15:00:00', null, TRUE),
-(18, 'andres.munoz@duocuc.cl', 'cliente109', 2, 'Andrés Felipe', 'Muñoz Bravo', '12.789.345-6', '989012345', 'region-valparaiso', 'quilpue', 'Calle Freire 123, Villa Esperanza', 'Cliente fiel', '2024-05-10 10:20:00', null, TRUE),
-(19, 'daniela.castro@duocuc.cl', 'cliente110', 2, 'Daniela Patricia', 'Castro Fuentes', '21.890.456-8', '945678903', 'region-biobio', 'los-angeles', 'Av. Ricardo Vicuña 456', 'Cliente semanal', '2024-05-15 12:40:00', null, TRUE);
+INSERT INTO `usuarios` (`id`, `email`, `password`, `role_id`, `nombre`, `apellido`, `run`, `telefono`, `region`, `comuna`, `direccion`, `foto_perfil_url`, `comentario`, `fecha_registro`, `activo`) VALUES
+(1, 'admin@duocuc.cl', 'admin123', 1, 'Super', 'Administrador', '12.345.678-9', '912345678', 'region-metropolitana', 'santiago', 'Av. Providencia 1234, Oficina 501', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765384383/image_5_y9jwh4.png', 'Admin sistema', '2024-01-15 08:00:00', TRUE),
+(2, 'maria.gonzalez@duocuc.cl', 'admin456', 1, 'María José', 'González Pérez', '15.678.234-5', '987654321', 'region-valparaiso', 'valparaiso', 'Calle Esmeralda 789, Casa 12', null, 'Admin DB', '2024-02-10 09:30:00', TRUE),
+(3, 'carlos.torres@profesor.duoc.cl', 'admin789', 1, 'Carlos Eduardo', 'Torres Silva', '18.234.567-8', '956789123', 'region-biobio', 'concepcion', 'Av. O''Higgins 2456, Depto 34B', null, 'Admin académico', '2024-01-25 14:15:00', TRUE),
+(4, 'ana.martinez@duocuc.cl', 'cliente123', 2, 'Ana María', 'Martínez López', '19.876.543-2', '945678912', 'region-metropolitana', 'las-condes', 'Av. Apoquindo 4567, Casa 78', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765384389/71yjljnPiJL._AC_UF894_1000_QL80__j4j6h9.png', 'Cliente VIP', '2024-03-05 10:20:00', TRUE),
+(5, 'pedro.ramirez@duocuc.cl', 'cliente456', 2, 'Pedro Antonio', 'Ramírez Castro', '16.789.123-4', '934567891', 'region-ohiggins', 'rancagua', 'Calle San Martín 1234, Villa El Sauce', null, 'Cliente frecuente', '2024-02-28 16:45:00', TRUE),
+(6, 'lucia.fernandez@duocuc.cl', 'cliente789', 2, 'Lucía Elena', 'Fernández Morales', '21.456.789-1', '923456789', 'region-araucania', 'temuco', 'Pasaje Los Aromos 567, Población Nueva', null, 'Estudiante DUOC', '2024-03-12 11:30:00', TRUE),
+(7, 'rodrigo.silva@duocuc.cl', 'vendedor123', 3, 'Rodrigo Alejandro', 'Silva Mendoza', '17.345.678-9', '967891234', 'region-metropolitana', 'maipu', 'Av. Pajaritos 3456, Block 12, Depto 204', null, 'Vendedor frutas', '2024-02-15 08:45:00', TRUE),
+(8, 'sofia.herrera@duocuc.cl', 'vendedor456', 3, 'Sofía Alejandra', 'Herrera Vásquez', '20.123.456-7', '956781234', 'region-maule', 'talca', 'Calle 1 Norte 2345, Villa Los Jardines', null, 'Vendedora lácteos', '2024-01-30 13:20:00', TRUE),
+(9, 'miguel.rojas@profesor.duoc.cl', 'vendedor789', 3, 'Miguel Ángel', 'Rojas Contreras', '14.567.890-1', '912347856', 'region-valparaiso', 'vina-del-mar', 'Av. Libertad 1789, Casa 45', null, 'Vendedor verduras', '2024-02-05 15:10:00', TRUE),
+(10, 'juan.perez@duocuc.cl', 'cliente101', 2, 'Juan Carlos', 'Pérez Soto', '13.234.567-8', '956789012', 'region-metropolitana', 'providencia', 'Av. Providencia 2345, Depto 12', null, 'Cliente orgánico', '2024-04-01 10:00:00', TRUE),
+(11, 'carla.lopez@duocuc.cl', 'cliente102', 2, 'Carla Andrea', 'López Muñoz', '17.890.123-4', '945678901', 'region-valparaiso', 'vina-del-mar', 'Calle Alvares 567, Casa 23', null, 'Cliente semanal', '2024-04-05 14:30:00', TRUE),
+(12, 'roberto.sanchez@duocuc.cl', 'cliente103', 2, 'Roberto Andrés', 'Sánchez Vera', '14.567.234-9', '912345678', 'region-biobio', 'talcahuano', 'Pasaje Los Pinos 890, Villa Mar', null, 'Cliente VIP', '2024-04-10 09:15:00', TRUE),
+(13, 'maria.silva@duocuc.cl', 'cliente104', 2, 'María Cristina', 'Silva Rojas', '16.345.678-2', '967890123', 'region-maule', 'curico', 'Av. Manso de Velasco 1234', null, 'Cliente lácteos', '2024-04-15 16:20:00', TRUE),
+(14, 'diego.morales@duocuc.cl', 'cliente105', 2, 'Diego Sebastián', 'Morales Castro', '19.123.456-7', '923456780', 'region-metropolitana', 'la-florida', 'Calle Walker Martinez 3456, Block A', null, 'Cliente eventos', '2024-04-20 11:45:00', TRUE),
+(15, 'valentina.rojas@duocuc.cl', 'cliente106', 2, 'Valentina Isabel', 'Rojas Hernández', '20.234.567-1', '934567892', 'region-ohiggins', 'san-fernando', 'Av. Libertador 789, Casa 45', null, 'Cliente regular', '2024-04-25 13:10:00', TRUE),
+(16, 'francisco.gomez@duocuc.cl', 'cliente107', 2, 'Francisco Javier', 'Gómez Torres', '15.890.234-5', '978901234', 'region-araucania', 'villarrica', 'Camino Villarrica 234, Km 5', null, 'Cliente certificado', '2024-05-01 08:30:00', TRUE),
+(17, 'camila.vargas@duocuc.cl', 'cliente108', 2, 'Camila Fernanda', 'Vargas Pérez', '18.456.789-3', '956781235', 'region-metropolitana', 'nunoa', 'Av. Irarrázaval 5678, Depto 301', null, 'Cliente familia', '2024-05-05 15:00:00', TRUE),
+(18, 'andres.munoz@duocuc.cl', 'cliente109', 2, 'Andrés Felipe', 'Muñoz Bravo', '12.789.345-6', '989012345', 'region-valparaiso', 'quilpue', 'Calle Freire 123, Villa Esperanza', null, 'Cliente fiel', '2024-05-10 10:20:00', TRUE),
+(19, 'daniela.castro@duocuc.cl', 'cliente110', 2, 'Daniela Patricia', 'Castro Fuentes', '21.890.456-8', '945678903', 'region-biobio', 'los-angeles', 'Av. Ricardo Vicuña 456', null, 'Cliente semanal', '2024-05-15 12:40:00', TRUE);
 
 -- Insertar Productos (con URLs de Cloudinary)
-INSERT INTO `productos` (`id`, `nombre`, `categoria_id`, `precio`, `stock`, `descripcion`, `imagen`, `imagen_url`, `activo`) VALUES
-(1, 'FR001 - Manzanas Fuji', 1, 1200, 150, 'Manzanas Fuji crujientes y dulces, cultivadas en el Valle del Maule.', 'manzana.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222680/manzana_boxrpo.jpg', TRUE),
-(2, 'FR002 - Naranjas Valencia', 1, 1000, 200, 'Jugosas y ricas en vitamina C, ideales para zumos frescos.', 'naranja.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222703/naranja_hvglex.jpg', TRUE),
-(3, 'FR003 - Plátanos Cavendish', 1, 800, 250, 'Plátanos maduros y dulces, perfectos para el desayuno.', 'platano.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222717/platano_lcha8m.jpg', TRUE),
-(4, 'VR001 - Zanahorias Organicas', 2, 900, 100, 'Zanahorias crujientes cultivadas sin pesticidas.', 'zanahoria.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222756/zanahoria_zgkxdz.jpg', TRUE),
-(5, 'VR002 - Espinacas Frescas', 2, 700, 80, 'Espinacas frescas y nutritivas, perfectas para ensaladas.', 'espinaca.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222611/espinaca_vpnnbp.jpg', TRUE),
-(6, 'VR003 - Pimentones Tricolores', 2, 1500, 120, 'Pimientos rojos, amarillos y verdes, ideales para salteados.', 'pimenton.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222710/pimenton_qpk7hr.jpg', TRUE),
-(7, 'PO001 - Miel Organica', 3, 5000, 50, 'Miel pura y orgánica producida por apicultores locales.', 'miel.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222688/miel_iyz7je.jpg', TRUE),
-(8, 'PO002 - Quinua Organica', 3, 3000, 70, 'Grano andino altamente nutritivo, ideal para ensaladas.', 'quinoa.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222729/quinoa_d3yhon.jpg', TRUE),
-(9, 'PL001 - Leche Entera', 4, 1200, 100, 'Leche fresca y pasteurizada, rica en calcio y vitaminas.', 'leche.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222671/leche_zw9npe.jpg', TRUE),
-(10, 'PL002 - Queso de cabra', 4, 5000, 100, 'Queso de cabra, alta en proteinas y calcio, contiene bajos niveles de grasaa saturadas.', 'queso.jpg', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765223606/queso_gkxdkd.jpg', TRUE);
+INSERT INTO `productos` (`id`, `nombre`, `categoria_id`, `precio`, `stock`, `descripcion`, `imagen_url`, `activo`) VALUES
+(1, 'FR001 - Manzanas Fuji', 1, 1200, 150, 'Manzanas Fuji crujientes y dulces, cultivadas en el Valle del Maule.', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222680/manzana_boxrpo.jpg', TRUE),
+(2, 'FR002 - Naranjas Valencia', 1, 1000, 200, 'Jugosas y ricas en vitamina C, ideales para zumos frescos.', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222703/naranja_hvglex.jpg', TRUE),
+(3, 'FR003 - Plátanos Cavendish', 1, 800, 250, 'Plátanos maduros y dulces, perfectos para el desayuno.', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222717/platano_lcha8m.jpg', TRUE),
+(4, 'VR001 - Zanahorias Organicas', 2, 900, 100, 'Zanahorias crujientes cultivadas sin pesticidas.', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222756/zanahoria_zgkxdz.jpg', TRUE),
+(5, 'VR002 - Espinacas Frescas', 2, 700, 80, 'Espinacas frescas y nutritivas, perfectas para ensaladas.', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222611/espinaca_vpnnbp.jpg', TRUE),
+(6, 'VR003 - Pimentones Tricolores', 2, 1500, 120, 'Pimientos rojos, amarillos y verdes, ideales para salteados.', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222710/pimenton_qpk7hr.jpg', TRUE),
+(7, 'PO001 - Miel Organica', 3, 5000, 50, 'Miel pura y orgánica producida por apicultores locales.', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222688/miel_iyz7je.jpg', TRUE),
+(8, 'PO002 - Quinua Organica', 3, 3000, 70, 'Grano andino altamente nutritivo, ideal para ensaladas.', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222729/quinoa_d3yhon.jpg', TRUE),
+(9, 'PL001 - Leche Entera', 4, 1200, 100, 'Leche fresca y pasteurizada, rica en calcio y vitaminas.', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222671/leche_zw9npe.jpg', TRUE),
+(10, 'PL002 - Queso de cabra', 4, 5000, 100, 'Queso de cabra, alta en proteinas y calcio, contiene bajos niveles de grasaa saturadas.', 'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765223606/queso_gkxdkd.jpg', TRUE);
 
 -- Insertar Órdenes (CORREGIDO CON SNAPSHOTS Y CAMPOS DE DESPACHO)
 -- Nota: Se han extraído los datos de los usuarios correspondientes para llenar los snapshots.
@@ -341,21 +339,21 @@ INSERT INTO `detalles_orden` (orden_id, producto_id, nombre_producto_snapshot, p
 INSERT INTO `blogs` (`title`, `banner_img`, `summary`, `body_text`, `author_img`, `author_name`, `publish_date`, `tag`) VALUES
 (
     'La importancia de consumir productos locales y frescos',
-    'blog1',
+    'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765382266/blog1_j6lndy.jpg',
     'Descubre por qué elegir frutas y verduras locales no solo beneficia tu salud, sino también a los agricultores y al medio ambiente.',
     'En Huerto Hogar creemos que cada compra es una decisión con impacto. Al elegir productos frescos y locales, apoyas a familias agricultoras y reduces la huella de carbono. Los alimentos no recorren grandes distancias, lo que significa más frescura y menos contaminación. Te invitamos a cuidar tu salud y apoyar al campo con cada compra.',
-    'pf',
-    'Freddy Turbina',
+    'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765382241/sv_qj88a9.png',
+    'Sebastián Valdivia',
     '02 de Septiembre, 2025',
     'Sostenibilidad'
 ),
 (
     'Cómo armar una despensa saludable con productos de Huerto Hogar',
-    'blog2',
+    'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765382267/blog2_iabxxy.jpg',
     'Aprende a organizar tu despensa con productos frescos y orgánicos que te ayudarán a llevar una alimentación balanceada y consciente.',
     'Una despensa bien organizada es el primer paso hacia una vida más saludable. Llena tu cocina con lo mejor del campo: frutas frescas como manzanas y plátanos, y verduras orgánicas como zanahorias. No olvides básicos como la miel orgánica y la quinua. Con pequeñas elecciones diarias, transformas tu alimentación con la calidad que Huerto Hogar garantiza.',
-    'sv',
-    'Dante Torbolino',
+    'https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765382235/pf_bnxy8n.png',
+    'Paula Frías',
     '20 de Abril, 2025',
     'Despensa saludable'
 );
