@@ -18,7 +18,7 @@ public class FavoritoResponseDTO {
         this.id = favorito.getId();
         this.productoId = favorito.getProducto().getId();
         this.nombreProducto = favorito.getProducto().getNombre();
-        this.categoriaProducto = favorito.getProducto().getCategoria();
+        this.categoriaProducto = favorito.getProducto().getCategoria().getNombre();
         this.precioProducto = favorito.getProducto().getPrecio();
         this.stockProducto = favorito.getProducto().getStock();
         this.descripcionProducto = favorito.getProducto().getDescripcion();

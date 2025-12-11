@@ -32,9 +32,22 @@ public class FavoritoServiceImpl implements FavoritoService {
     @Override
     @Transactional(readOnly = true)
     public List<FavoritoResponseDTO> getFavoritosByUsuarioId(Integer usuarioId) {
-        // Get favorites only for active users and active products
-        return favoritoRepository.findActiveByUsuarioId(usuarioId).stream()
-                .map(FavoritoResponseDTO::new)
+        // Get favorites with fresh product data from database
+        // The JOIN FETCH ensures we get current product data, not cached snapshots
+        List<Favorito> favoritos = favoritoRepository.findActiveByUsuarioId(usuarioId);
+        
+        return favoritos.stream()
+                .map(favorito -> {
+                    // Force refresh of product data to ensure we have latest values
+                    Producto producto = productoRepository.findById(favorito.getProducto().getId())
+                            .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado"));
+                    
+                    // Create a temporary favorito with fresh product data
+                    Favorito favoritoFresco = new Favorito(favorito.getUsuario(), producto);
+                    favoritoFresco.setId(favorito.getId());
+                    
+                    return new FavoritoResponseDTO(favoritoFresco);
+                })
                 .collect(Collectors.toList());
     }
 
