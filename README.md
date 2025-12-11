@@ -1,45 +1,203 @@
-# Huerto Hogar - Backend API
+# 🌱 Huerto Hogar - Backend API
 
-## Descripción
+API REST desarrollada con **Spring Boot** para la plataforma de e-commerce móvil **Huerto Hogar**. Proporciona servicios completos de gestión de productos orgánicos, usuarios, categorías, órdenes, favoritos y autenticación para una aplicación Android nativa.
 
-API REST desarrollada con Spring Boot para la plataforma e-commerce Huerto Hogar. Proporciona servicios completos de gestión de productos, usuarios, categorías, órdenes y autenticación con JWT para tres roles de usuario: Administrador, Vendedor y Cliente.
+## 📋 Tabla de Contenidos
 
-## Tecnologías
+- [Descripción General](#-descripción-general)
+- [Características](#-características)
+- [Tecnologías](#-tecnologías)
+- [Arquitectura](#-arquitectura)
+- [Requisitos](#-requisitos)
+- [Instalación](#-instalación)
+- [Configuración](#-configuración)
+- [Estructura del Proyecto](#-estructura-del-proyecto)
+- [Endpoints API](#-endpoints-api)
+- [Base de Datos](#-base-de-datos)
+- [Cloudinary](#-cloudinary---gestión-de-imágenes)
+- [Seguridad](#-seguridad-y-autenticación)
+- [Testing](#-testing)
+- [Documentación](#-documentación-api)
 
-- **Spring Boot 3.3.5** - Framework principal
-- **Java 21** - Lenguaje de programación
-- **Spring Security** - Autenticación y autorización
-- **JWT (JSON Web Tokens)** - Tokens de acceso con expiración de 5 horas
-- **Spring Data JPA** - ORM y persistencia de datos
-- **MySQL** - Base de datos relacional
+---
+
+## 🎯 Descripción General
+
+Backend robusto para marketplace móvil de productos orgánicos y frescos, con arquitectura RESTful completa que soporta:
+
+- 🛍️ **CRUD completo** de productos, usuarios y órdenes
+- ❤️ **Sistema de favoritos** persistente
+- 📦 **Gestión de órdenes** con estados y snapshots históricos
+- 📸 **Integración con Cloudinary** para imágenes
+- 🔒 **Soft delete** para productos y usuarios
+- 🔄 **Validación en tiempo real** de productos activos
+
+### Roles de Usuario
+
+- **👨‍💼 Admin**: Control total del sistema
+- **👤 Cliente**: Compras y gestión de favoritos
+
+---
+
+## ✨ Características
+
+### Funcionalidades Principales
+
+- ✅ **Autenticación simple** 
+- ✅ **CRUD de Productos** con categorías
+- ✅ **Gestión de Usuarios** con roles
+- ✅ **Sistema de Favoritos** con validación de productos activos
+- ✅ **Órdenes con Snapshots** (precios/nombres históricos)
+- ✅ **Costo de Envío Fijo** ($3,000)
+- ✅ **Soft Delete** (borrado lógico)
+- ✅ **Imágenes en Cloudinary** (CDN externo)
+- ✅ **Validación de Datos** (emails @duocuc.cl, RUN chileno)
+- ✅ **CORS Configurado** para cliente Android
+
+---
+
+## 🛠️ Tecnologías
+
+### Core
+
+- **Spring Boot** 3.3.5 - Framework principal
+- **Java** 21 - Lenguaje de programación
+- **Spring Data JPA** - ORM y persistencia
+- **Hibernate** - Implementación JPA
+- **MySQL** 8.0+ - Base de datos relacional
+
+### Dependencias Clave
+
+- **Spring Web** - RESTful API
+- **Spring Validation** - Validación de DTOs
+- **Lombok** - Reducción de boilerplate
+- **Springdoc OpenAPI** 2.6.0 - Documentación Swagger
+- **Cloudinary** 1.33.0 - Gestión de imágenes CDN
 - **Maven** - Gestión de dependencias
-- **Springdoc OpenAPI 2.6.0** - Documentación Swagger UI
-- **Cloudinary** - Hosting de imágenes externo (CDN)
 
-## Requisitos Previos
+### Testing
 
-- **Java JDK 21**
-- **Maven 3.8+**
-- **MySQL 8.0+**
-- Puerto **8080** disponible para el servidor
-- Puerto **3306** disponible para MySQL
-- **Cuenta de Cloudinary** (gratuita) - https://cloudinary.com
+- **JUnit 5** - Framework de testing
+- **Spring Boot Test** - Testing integrado
+- **H2 Database** - Base de datos en memoria para tests
 
-## Instalación
+---
 
-### 1. Configurar Base de Datos
+## 🏗️ Arquitectura
+
+### Patrón MVC con Capas
+
+```
+┌─────────────────────────────────────────────────────┐
+│              Controller Layer                       │
+│  ┌─────────────────────────────────────────────┐    │
+│  │  REST Controllers (@RestController)         │    │
+│  │  - ProductoController                       │    │
+│  │  - UsuarioController                        │    │
+│  │  - OrdenController                          │    │
+│  │  - FavoritoController, etc.                 │    │
+│  └────────────────┬────────────────────────────┘    │
+└───────────────────┼─────────────────────────────────┘
+                    │ calls Service
+                    ▼
+┌─────────────────────────────────────────────────────┐
+│              Service Layer                          │
+│  ┌─────────────────────────────────────────────┐    │
+│  │  Business Logic (@Service)                  │    │
+│  │  - ProductoService                          │    │
+│  │  - UsuarioService                           │    │
+│  │  - OrdenService                             │    │
+│  │  - CloudinaryService (image upload)         │    │
+│  └────────────────┬────────────────────────────┘    │
+└───────────────────┼─────────────────────────────────┘
+                    │ uses Repository
+                    ▼
+┌─────────────────────────────────────────────────────┐
+│           Repository Layer (JPA)                    │
+│  ┌─────────────────────────────────────────────┐    │
+│  │  Data Access (@Repository)                  │    │
+│  │  - ProductoRepository                       │    │
+│  │  - UsuarioRepository                        │    │
+│  │  - OrdenRepository                          │    │
+│  │  - FavoritoRepository                       │    │
+│  └────────────────┬────────────────────────────┘    │
+└───────────────────┼─────────────────────────────────┘
+                    │ JDBC/Hibernate
+                    ▼
+            ┌───────────────┐
+            │  MySQL 8.0+   │
+            │   hh_db       │
+            └───────────────┘
+```
+
+### Flujo de Petición
+
+1. **Cliente Android** envía HTTP Request
+2. **Controller** recibe y valida DTO
+3. **Service** ejecuta lógica de negocio
+4. **Repository** accede a base de datos (JPA)
+5. **Response** fluye de vuelta como JSON
+
+---
+
+## 📋 Requisitos
+
+### Software Necesario
+
+- ☕ **Java JDK** 21 o superior
+- 📦 **Maven** 3.8+
+- 🐬 **MySQL** 8.0+
+- 🌐 Puerto **8080** disponible (backend server)
+- 🔌 Puerto **3306** disponible (MySQL)
+- ☁️ **Cuenta Cloudinary** capa gratuita 
+
+### Cliente
+
+- 📱 **Android App** ([Frontend Repository](https://github.com/ZalkiRyon/Huerto_Hogar_Frontend_Movil))
+
+---
+
+## 🚀 Instalación
+
+### 1. Clonar el Repositorio
 
 ```bash
-# Crear base de datos
+git clone https://github.com/ZalkiRyon/Huerto_Hogar_Backend_Movil.git
+cd Huerto_Hogar_Backend_Movil
+```
+
+### 2. Configurar Base de Datos
+
+#### Opción A: Importar Script SQL
+
+```bash
 mysql -u root -p < bbdd.sql
 ```
 
-El script `bbdd.sql` crea la base de datos `hh_db` con las siguientes tablas:
-- `roles` - Roles de usuario (Admin, Vendedor, Cliente)
-- `categorias` - Categorías de productos con prefijos automáticos
-- `usuarios` - Usuarios del sistema
-- `productos` - Catálogo de productos con `imagen_url` apuntando a Cloudinary
-- `ordenes` y `ordenes_productos` - Gestión de pedidos
+#### Opción B: Manual
+
+```sql
+-- Crear base de datos
+CREATE DATABASE hh_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Importar datos
+USE hh_db;
+SOURCE bbdd.sql;
+```
+
+El script `bbdd.sql` crea:
+
+| Tabla | Descripción | Características |
+|-------|-------------|-----------------|
+| `roles` | Roles de sistema | admin, cliente |
+| `categorias` | Categorías de productos | Con prefijos (FR, VR, PO, PL) |
+| `usuarios` | Usuarios del sistema | Soft delete con `activo` |
+| `productos` | Catálogo de productos | Soft delete, `imagen_url` Cloudinary |
+| `favoritos` | Relación usuario-producto | UNIQUE constraint, CASCADE |
+| `ordenes` | Pedidos con snapshots | Datos históricos del cliente |
+| `detalles_orden` | Items de orden | Snapshots de producto y precio |
+| `estados` | Estados de órdenes | Enviado, Pendiente, Cancelado, Procesando |
+| `blogs` | Artículos informativos | Con imágenes y autores |
 
 ### 2. Configurar Cloudinary (Obligatorio)
 
@@ -84,224 +242,804 @@ El proyecto usa **Cloudinary** como CDN para almacenar imágenes de productos. S
 Edita `src/main/resources/application.properties`:
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/hh_db
-spring.datasource.username=tu_usuario
-spring.datasource.password=tu_contraseña
+# Conexión MySQL
+spring.datasource.url=jdbc:mysql://localhost:3306/hh_db?serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=tu_password
+
+# JPA/Hibernate
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=true
 ```
 
-### 4. Instalar Dependencias y Ejecutar
+### 4. Instalar Dependencias
 
 ```bash
-# Compilar y ejecutar tests
+# Limpiar y compilar
 ./mvnw clean install
 
-# Ejecutar servidor
-./mvnw spring-boot:run
+# O sin ejecutar tests
+./mvnw clean install -DskipTests
 ```
 
-El servidor iniciará en `http://localhost:8080`
-
-**Si los tests o el servidor fallan**, verifica que:
-- MySQL esté ejecutándose en `localhost:3306`
-- La base de datos `hh_db` exista
-- `application-local.properties` exista con credenciales de Cloudinary válidas
-- El profile `local` esté activo en `application.properties`
-
-## Ejecución
+### 5. Ejecutar Servidor
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
+✅ Servidor corriendo en: `http://localhost:8080`
 
-El servidor se iniciará en `http://localhost:8080`
+---
 
+## ⚙️ Configuración
 
-## Documentación API
+### Variables de Entorno
+
+#### `application.properties` (principal)
+
+```properties
+# Server
+server.port=8080
+
+# Database
+spring.datasource.url=jdbc:mysql://localhost:3306/hh_db?serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=tu_password
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+
+# Profile activo (carga application-local.properties)
+spring.profiles.active=local
+
+# Multipart (tamaño máximo de archivos)
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
+```
+
+#### `application-local.properties` (credenciales Cloudinary)
+
+```properties
+# Cloudinary Configuration (GITIGNORED)
+cloudinary.cloud-name=tu_cloud_name
+cloudinary.api-key=tu_api_key
+cloudinary.api-secret=tu_api_secret
+```
+
+---
+
+## 🗂️ Estructura del Proyecto
+
+```
+src/main/java/com/backend/huertohogar/
+│
+├── config/
+│   ├── CorsConfig.java              # Configuración CORS
+│   ├── CloudinaryConfig.java        # Bean de Cloudinary
+│   └── OpenApiConfig.java           # Swagger UI config
+│
+├── controller/                      # REST Endpoints
+│   ├── AuthController.java          # Login
+│   ├── ProductoController.java      # CRUD Productos
+│   ├── UsuarioController.java       # CRUD Usuarios
+│   ├── OrdenController.java         # CRUD Órdenes
+│   ├── FavoritoController.java      # Sistema de Favoritos
+│   ├── CategoriaController.java     # Categorías
+│   └── BlogController.java          # Blogs
+│
+├── dto/                             # Data Transfer Objects
+│   ├── request/
+│   │   ├── LoginRequestDTO.java
+│   │   ├── ProductoRequestDTO.java
+│   │   ├── UsuarioRequestDTO.java
+│   │   └── OrdenRequestDTO.java
+│   │
+│   └── response/
+│       ├── ProductoResponseDTO.java
+│       ├── UsuarioResponseDTO.java
+│       ├── FavoritoResponseDTO.java
+│       └── OrdenResponseDTO.java
+│
+├── model/                           # Entidades JPA
+│   ├── Producto.java                # @Entity productos
+│   ├── Usuario.java                 # @Entity usuarios
+│   ├── Orden.java                   # @Entity ordenes
+│   ├── DetalleOrden.java            # @Entity detalles_orden
+│   ├── Favorito.java                # @Entity favoritos
+│   ├── Categoria.java               # @Entity categorias
+│   ├── Estado.java                  # @Entity estados
+│   ├── Role.java                    # @Entity roles
+│   └── Blog.java                    # @Entity blogs
+│
+├── repository/                      # JPA Repositories
+│   ├── ProductoRepository.java
+│   ├── UsuarioRepository.java
+│   ├── OrdenRepository.java
+│   ├── FavoritoRepository.java
+│   ├── CategoriaRepository.java
+│   └── ... (otros)
+│
+├── service/                         # Lógica de Negocio
+│   ├── impl/
+│   │   ├── ProductoServiceImpl.java
+│   │   ├── UsuarioServiceImpl.java
+│   │   ├── OrdenServiceImpl.java
+│   │   ├── FavoritoServiceImpl.java
+│   │   └── CloudinaryService.java   # Upload a Cloudinary
+│   │
+│   └── (interfaces)
+│
+├── exception/                       # Manejo de Excepciones
+│   ├── ResourceNotFoundException.java
+│   └── GlobalExceptionHandler.java
+│
+└── HuertoHogarApplication.java      # Main class
+
+src/main/resources/
+├── application.properties           # Config principal
+├── application-local.properties.template  # Template Cloudinary
+└── bbdd.sql                         # Script de base de datos
+
+src/test/
+└── java/com/backend/huertohogar/
+    └── (tests unitarios)
+```
+
+---
+
+## 🌐 Endpoints API
+
+### Base URL
+
+```
+http://localhost:8080/api/
+```
+
+### **1. Autenticación** (`AuthController`)
+
+| Método | Endpoint | Descripción | Body |
+|--------|----------|-------------|------|
+| POST | `/auth/login` | Login de usuario | `{ email, password }` |
+| POST | `/auth/register` | Registro público | `{ email, password, nombre, ... }` |
+
+### **2. Productos** (`ProductoController`)
+
+| Método | Endpoint | Descripción | Permisos |
+|--------|----------|-------------|----------|
+| GET | `/productos` | Todos los productos | Público |
+| GET | `/productos/activos` | Solo productos activos | Público |
+| GET | `/productos/inactivos` | Solo productos inactivos | Admin |
+| GET | `/productos/categoria/{id}` | Productos por categoría | Público |
+| GET | `/productos/{id}` | Detalle de producto | Público |
+| POST | `/productos` | Crear producto | Admin |
+| PUT | `/productos/{id}` | Actualizar producto | Admin |
+| PUT | `/productos/{id}/activar` | Reactivar producto | Admin |
+| PUT | `/productos/{id}/desactivar` | Desactivar producto (soft delete) | Admin |
+| POST | `/productos/{id}/imagen` | Subir imagen (Cloudinary) | Admin |
+
+**Ejemplo Request - Crear Producto:**
+```json
+POST /api/productos
+{
+  "nombre": "FR001 - Manzanas Fuji",
+  "categoriaId": 1,
+  "precio": 1200,
+  "stock": 150,
+  "descripcion": "Manzanas frescas del valle",
+  "activo": true
+}
+```
+
+**Ejemplo Response:**
+```json
+{
+  "id": 1,
+  "nombre": "FR001 - Manzanas Fuji",
+  "categoria": "Frutas frescas",
+  "precio": 1200,
+  "stock": 150,
+  "descripcion": "Manzanas frescas del valle",
+  "imagenUrl": "https://res.cloudinary.com/.../manzana.jpg",
+  "activo": true
+}
+```
+
+### **3. Usuarios** (`UsuarioController`)
+
+| Método | Endpoint | Descripción | Permisos |
+|--------|----------|-------------|----------|
+| GET | `/usuarios` | Todos los usuarios | Admin |
+| GET | `/usuarios/activos` | Solo usuarios activos | Admin |
+| GET | `/usuarios/inactivos` | Solo usuarios inactivos | Admin |
+| GET | `/usuarios/{id}` | Detalle de usuario | Usuario propio / Admin |
+| POST | `/usuarios` | Crear usuario | Admin |
+| PUT | `/usuarios/{id}` | Actualizar usuario | Usuario propio / Admin |
+| PUT | `/usuarios/{id}/activar` | Reactivar usuario | Admin |
+| PUT | `/usuarios/{id}/desactivar` | Desactivar usuario | Admin |
+| POST | `/usuarios/{id}/imagen` | Subir foto de perfil | Usuario propio |
+
+### **4. Favoritos** (`FavoritoController`)
+
+| Método | Endpoint | Descripción | Body |
+|--------|----------|-------------|------|
+| GET | `/favoritos/usuario/{usuarioId}` | Favoritos del usuario | - |
+| POST | `/favoritos` | Agregar a favoritos | `{ usuarioId, productoId }` |
+| DELETE | `/favoritos` | Remover de favoritos | `{ usuarioId, productoId }` |
+
+**Características Especiales:**
+- ✅ Retorna datos actualizados del producto (precio, nombre, stock)
+- ✅ Filtra automáticamente productos inactivos
+- ✅ Validación de productos activos en backend
+
+### **5. Órdenes** (`OrdenController`)
+
+| Método | Endpoint | Descripción | Permisos |
+|--------|----------|-------------|----------|
+| GET | `/ordenes` | Todas las órdenes | Admin |
+| GET | `/ordenes/usuario/{id}` | Órdenes de un usuario | Usuario propio / Admin |
+| GET | `/ordenes/{id}` | Detalle de orden | Usuario propio / Admin |
+| POST | `/ordenes` | Crear orden | Cliente autenticado |
+| PUT | `/ordenes/{id}/estado` | Actualizar estado | Admin |
+| DELETE | `/ordenes/{id}` | Eliminar orden | Admin |
+
+**Request - Crear Orden:**
+```json
+POST /api/ordenes
+{
+  "clienteId": 4,
+  "detalles": [
+    {
+      "productoId": 1,
+      "cantidad": 2,
+      "precioUnitario": 1200
+    }
+  ],
+  "direccionEnvio": "Av. Providencia 123",
+  "regionEnvio": "region-metropolitana",
+  "comunaEnvio": "providencia",
+  "telefonoContacto": "912345678",
+  "costoEnvio": 3000,
+  "estadoId": 2,
+  "comentario": ""
+}
+```
+
+**Características Especiales:**
+- 📸 **Snapshots históricos**: Guarda nombre y precio del producto al momento de compra
+- 🚚 **Costo de envío fijo**: $3,000 por orden
+- 📊 **Estados**: Pendiente (2), Procesando (4), Enviado (1), Cancelado (3)
+
+### **6. Categorías** (`CategoriaController`)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/categorias` | Todas las categorías |
+
+**Categorías Disponibles:**
+- **Frutas frescas** (FR)
+- **Verduras orgánicas** (VR)
+- **Productos orgánicos** (PO)
+- **Productos lácteos** (PL)
+
+### **7. Blogs** (`BlogController`)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/blogs` | Todos los blogs |
+| GET | `/blogs/{id}` | Detalle de blog |
+
+---
+
+## 📚 Documentación API
 
 ### Swagger UI
-Una vez iniciado el servidor, accede a:
+
+Una vez iniciado el servidor:
+
 ```
 http://localhost:8080/swagger-ui/index.html
 ```
 
-### Autenticación en Swagger
+**Características:**
+- 📖 Documentación interactiva completa
+- 🧪 Prueba de endpoints en vivo
+- 📝 Schemas de DTOs
+- 🔍 Ejemplos de requests/responses
 
-1. Ejecuta `POST /api/auth/login` con credenciales válidas
-2. Copia el token JWT de la respuesta
-3. Haz clic en el botón **"Authorize"** 🔒 (arriba a la derecha)
-4. Pega el token (sin el prefijo "Bearer")
-5. Todas las peticiones posteriores incluirán automáticamente el token
+---
 
-## Endpoints Principales
+## 🗄️ Base de Datos
 
-### Autenticación
-- `POST /api/auth/login` - Login y obtención de token JWT
+### Diseño de Tablas
 
-### Registro Público (sin autenticación)
-- `POST /api/public/register/validate-email` - Validar disponibilidad de email
-- `POST /api/public/register/create-user` - Crear nuevo usuario (rol Cliente)
+#### **1. Productos - Soft Delete**
+```sql
+CREATE TABLE productos (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(150) NOT NULL UNIQUE,
+  categoria_id INT NOT NULL,
+  precio INT NOT NULL DEFAULT 0,
+  stock INT NOT NULL DEFAULT 0,
+  descripcion TEXT,
+  imagen_url VARCHAR(500),  -- URL de Cloudinary
+  activo BOOLEAN NOT NULL DEFAULT TRUE,  -- Soft delete
+  FOREIGN KEY (categoria_id) REFERENCES categorias(id)
+);
+```
 
-### Usuarios (ADMIN)
-- `GET /api/usuarios` - Listar todos los usuarios
-- `GET /api/usuarios/{id}` - Obtener usuario por ID
-- `POST /api/usuarios` - Crear usuario
-- `PUT /api/usuarios/{id}` - Actualizar usuario
-- `DELETE /api/usuarios/{id}` - Eliminar usuario
+**Soft Delete:**
+- `activo = true` → Producto visible en catálogo
+- `activo = false` → Producto "eliminado" (no se muestra pero se mantiene en BD)
 
-### Productos (GET público, POST/PUT/DELETE protegidos)
-- `GET /api/productos` - Listar productos activos
-- `GET /api/productos/{id}` - Obtener producto por ID
-- `POST /api/productos` - Crear producto (ADMIN)
-- `POST /api/productos/{id}/imagen` - Subir imagen a Cloudinary (ADMIN)
-- `PUT /api/productos/{id}` - Actualizar producto (ADMIN)
-- `DELETE /api/productos/{id}` - Borrado lógico (ADMIN)
+#### **2. Favoritos - Relación Pura**
+```sql
+CREATE TABLE favoritos (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  usuario_id INT NOT NULL,
+  producto_id INT NOT NULL,
+  UNIQUE KEY uk_usuario_producto (usuario_id, producto_id),
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE RESTRICT,
+  FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE RESTRICT
+);
+```
 
-### Categorías
-- `GET /api/categorias` - Listar todas las categorías
-- `GET /api/categorias/{id}` - Obtener categoría por ID
-- `POST /api/categorias` - Crear categoría (ADMIN)
-- `PUT /api/categorias/{id}` - Actualizar categoría (ADMIN)
-- `DELETE /api/categorias/{id}` - Eliminar categoría (ADMIN)
+**Características:**
+- ✅ Almacena solo la relación (usuario-producto)
+- ✅ NO guarda snapshots de datos
+- ✅ Los datos del producto se obtienen mediante JOIN
+- ✅ Siempre muestra información actualizada
+- ✅ Filtra automáticamente productos inactivos
 
-### Órdenes
-- `GET /api/ordenes` - Listar órdenes (ADMIN, VENDEDOR)
-- `GET /api/ordenes/{id}` - Obtener orden por ID
-- `GET /api/ordenes/cliente/{id}` - Órdenes de un cliente
-- `POST /api/ordenes` - Crear orden (CLIENTE)
-- `PUT /api/ordenes/{id}` - Actualizar estado (ADMIN, VENDEDOR)
-- `POST /api/ordenes/calcular-envio` - Calcular costo de envío (público)
+**Query de Favoritos:**
+```java
+@Query("SELECT f FROM Favorito f JOIN f.usuario u JOIN f.producto p " +
+       "WHERE u.id = :usuarioId AND u.activo = true AND p.activo = true")
+List<Favorito> findActiveByUsuarioId(@Param("usuarioId") Integer usuarioId);
+```
 
-### Roles
-- `GET /api/roles` - Listar roles (ADMIN)
+#### **3. Órdenes - Snapshots Históricos**
+```sql
+CREATE TABLE ordenes (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  numero_orden VARCHAR(50) NOT NULL UNIQUE,
+  cliente_id INT NULL,  -- Puede ser NULL si usuario se elimina
+  
+  -- SNAPSHOTS (datos históricos)
+  nombre_cliente_snapshot VARCHAR(200) NOT NULL,
+  email_cliente_snapshot VARCHAR(100) NOT NULL,
+  direccion_envio VARCHAR(255) NOT NULL,
+  region_envio VARCHAR(100) NOT NULL,
+  comuna_envio VARCHAR(100) NOT NULL,
+  
+  fecha DATE,
+  estado_id INT NOT NULL,
+  monto_total INT NOT NULL DEFAULT 0,
+  costo_envio INT NOT NULL DEFAULT 0,
+  comentario TEXT,
+  
+  FOREIGN KEY (cliente_id) REFERENCES usuarios(id) ON DELETE SET NULL,
+  FOREIGN KEY (estado_id) REFERENCES estados(id)
+);
 
-## Seguridad y Autenticación
+CREATE TABLE detalles_orden (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  orden_id INT NOT NULL,
+  producto_id INT NULL,  -- Referencia opcional
+  
+  -- SNAPSHOTS (lo que realmente se vendió)
+  nombre_producto_snapshot VARCHAR(150) NOT NULL,
+  precio_unitario_snapshot INT NOT NULL,
+  
+  cantidad INT NOT NULL DEFAULT 1,
+  subtotal INT NOT NULL,
+  
+  FOREIGN KEY (orden_id) REFERENCES ordenes(id) ON DELETE CASCADE,
+  FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE SET NULL
+);
+```
 
-### JWT Configuration
-- **Algoritmo**: HS256
-- **Expiración**: 5 horas
-- **Secret Key**: Configurada en código
-- **Claims**: role, userId, username
+**¿Por qué Snapshots?**
+- 📸 Mantienen historial exacto de lo comprado
+- 💰 Si el precio cambia, las órdenes antiguas mantienen el precio original
+- 📝 Si el nombre cambia, las órdenes reflejan el nombre al momento de compra
+- 🗑️ Si el producto se elimina, la orden mantiene el registro
+
+### Relaciones
+
+```
+usuarios (1) ──────────< (N) ordenes
+usuarios (1) ──────────< (N) favoritos >─────────── (1) productos
+categorias (1) ────────< (N) productos
+ordenes (1) ───────────< (N) detalles_orden >────── (1) productos
+estados (1) ───────────< (N) ordenes
+```
+
+---
+
+## 🔒 Seguridad y Autenticación
+
+### Sistema de Autenticación
+
+**Implementación Simplificada (Sin JWT):**
+- ✅ Login básico con validación de credenciales
+- ✅ Control de acceso por roles
+- ✅ CORS configurado para cliente Android
 
 ### Validaciones Implementadas
-- **Email**: Debe terminar en `@duocuc.cl` o `@profesor.duoc.cl`
-- **RUN**: Formato `##.###.###-K` con validación de patrón
-- **Contraseña**: Mínimo 4 caracteres (sin encriptación)
-- **Dirección**: Mínimo 5 caracteres
 
-### Control de Acceso (Role-Based)
-```
-ADMIN     → Acceso completo a todos los endpoints
-VENDEDOR  → Gestión de órdenes y visualización de productos
-CLIENTE   → Creación de órdenes y navegación de tienda
-PÚBLICO   → Login, registro, catálogo de productos, cálculo de envío
-```
+| Campo | Validación | Ejemplo |
+|-------|------------|---------|
+| **Email** | `@duocuc.cl` o `@profesor.duoc.cl` | `alumno@duocuc.cl` |
+| **RUN** | Formato chileno `##.###.###-K` | `12.345.678-9` |
+| **Contraseña** | Mínimo 4 caracteres | `cliente123` |
+| **Teléfono** | Opcional, mínimo 9 dígitos | `912345678` |
+| **Dirección** | Opcional, mínimo 5 caracteres | `Av. Providencia 123` |
 
-## Estructura del Proyecto
+### Roles y Permisos
 
-```
-src/main/java/com/backend/huertohogar/
-├── config/              # Configuraciones (Security, OpenAPI, CORS)
-├── controller/          # Endpoints REST
-├── dto/                 # Data Transfer Objects
-├── exception/           # Manejadores de excepciones
-├── model/               # Entidades JPA
-├── repository/          # Repositorios de datos
-├── security/            # JWT Utils, Filters, UserDetailsService
-└── service/             # Lógica de negocio
-```
+| Rol | Permisos |
+|-----|----------|
+| **👨‍💼 Admin** | ✅ Gestión completa de productos, usuarios y órdenes<br>✅ Activar/desactivar productos y usuarios<br>✅ Ver estadísticas y reportes |
+| **👤 Cliente** | ✅ Ver catálogo de productos<br>✅ Agregar a favoritos<br>✅ Crear órdenes<br>✅ Ver historial de compras<br>✅ Actualizar perfil |
 
-## Configuración CORS
+### CORS Configuration
 
-El backend está configurado para aceptar peticiones desde:
-```
-http://localhost:3000 (frontend React)
-```
-
-Métodos permitidos: GET, POST, PUT, DELETE, OPTIONS
-
-## Cloudinary - Gestión de Imágenes
-
-### ¿Por qué Cloudinary?
-
-El backend usa **Cloudinary** como CDN externo para almacenar imágenes de productos por las siguientes razones:
-- ✅ **Hosting externo**: Las imágenes no se guardan en la base de datos ni en el servidor
-- ✅ **CDN global**: Entrega rápida desde servidores distribuidos globalmente
-- ✅ **Optimización automática**: Compresión y redimensionamiento de imágenes
-- ✅ **Plan gratuito**: 25GB storage y 25GB bandwidth/mes
-- ✅ **URLs públicas**: Accesibles desde cualquier cliente (Android, Web, iOS)
-
-### Cómo funciona
-
-1. **Upload de imagen**: 
-   ```
-   POST /api/productos/{id}/imagen
-   Content-Type: multipart/form-data
-   Body: file=imagen.jpg
-   ```
-   - El archivo se sube a Cloudinary
-   - Se obtiene una URL pública (ej: `https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222680/manzana_boxrpo.jpg`)
-   - La URL se guarda en la columna `imagen_url` de la tabla `productos`
-
-2. **Obtención de imagen**:
-   - El endpoint `GET /api/productos` devuelve el campo `imagenUrl`
-   - El cliente Android usa Coil para cargar la imagen desde la URL
-
-3. **Seguridad**:
-   - Las credenciales están en `application-local.properties` (gitignored)
-   - Los tests usan credenciales mock en `src/test/resources/application.properties`
-
-### Ejemplo de Response
-
-```json
-{
-  "id": 1,
-  "nombre": "Manzana Fuji",
-  "descripcion": "Manzanas frescas importadas...",
-  "precio": 2500,
-  "stock": 100,
-  "imagenUrl": "https://res.cloudinary.com/dg7dcbcjn/image/upload/v1765222680/manzana_boxrpo.jpg",
-  "activo": true,
-  "categoria": {
-    "id": 1,
-    "nombre": "Frutas frescas"
-  }
+**Orígenes Permitidos:**
+```java
+@Configuration
+public class CorsConfig {
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        
+        config.addAllowedOrigin("*");  // Permite desde cualquier origen
+        config.addAllowedMethod("*");  // GET, POST, PUT, DELETE, OPTIONS
+        config.addAllowedHeader("*");
+        
+        source.registerCorsConfiguration("/api/**", config);
+        return new CorsFilter(source);
+    }
 }
 ```
 
-## Datos de Prueba
+**Cliente Android:**
+- Base URL: `http://10.0.2.2:8080/api/` (emulador)
+- Base URL: `http://192.168.1.X:8080/api/` (dispositivo físico)
 
-El script `bbdd.sql` incluye datos iniciales:
+---
+
+## ☁️ Cloudinary - Gestión de Imágenes
+
+### ¿Por qué Cloudinary?
+
+El backend usa **Cloudinary** como CDN externo para almacenar todas las imágenes:
+
+| Ventaja | Descripción |
+|---------|-------------|
+| 🌐 **CDN Global** | Entrega rápida desde servidores distribuidos |
+| 💾 **Sin carga en servidor** | Imágenes no ocupan espacio en backend |
+| 🔄 **Optimización automática** | Compresión y redimensionamiento |
+| 💰 **Plan gratuito** | 25GB storage + 25GB bandwidth/mes |
+| 📱 **URLs públicas** | Accesibles desde Android, Web, iOS |
+| 🔒 **Seguro** | Credenciales en backend, no expuestas |
+
+### Flujo de Carga
+
+```
+1. 📱 Android App selecciona imagen (galería/cámara)
+   ↓
+2. 📤 Envía MultipartFile al backend
+   POST /api/productos/{id}/imagen
+   ↓
+3. 🖥️ Backend recibe archivo
+   CloudinaryService.uploadProductImage(file)
+   ↓
+4. ☁️ Backend sube a Cloudinary API
+   cloudinary.uploader().upload(file.bytes, options)
+   ↓
+5. 🔗 Cloudinary retorna URL pública
+   https://res.cloudinary.com/.../manzana.jpg
+   ↓
+6. 💾 Backend guarda URL en columna imagen_url
+   producto.setImagenUrl(cloudinaryUrl)
+   ↓
+7. ✅ Backend retorna URL al frontend
+   { "imageUrl": "https://..." }
+   ↓
+8. 🖼️ Android carga imagen con Coil
+   AsyncImage(model = imageUrl)
+```
+
+### Implementación Backend
+
+**CloudinaryService.java:**
+```java
+@Service
+public class CloudinaryService {
+    private final Cloudinary cloudinary;
+    
+    public String uploadProductImage(MultipartFile file) throws IOException {
+        Map uploadResult = cloudinary.uploader().upload(
+            file.getBytes(),
+            ObjectUtils.asMap(
+                "folder", "productos",
+                "resource_type", "image"
+            )
+        );
+        return uploadResult.get("secure_url").toString();
+    }
+    
+    public String uploadProfilePicture(MultipartFile file) throws IOException {
+        Map uploadResult = cloudinary.uploader().upload(
+            file.getBytes(),
+            ObjectUtils.asMap(
+                "folder", "usuarios",
+                "resource_type", "image"
+            )
+        );
+        return uploadResult.get("secure_url").toString();
+    }
+}
+```
+
+**ProductoController.java:**
+```java
+@PostMapping("/{id}/imagen")
+public ResponseEntity<String> uploadProductImage(
+    @PathVariable Long id,
+    @RequestPart("file") MultipartFile file
+) {
+    String imageUrl = cloudinaryService.uploadProductImage(file);
+    productoService.updateProductImage(id, imageUrl);
+    return ResponseEntity.ok().body("\"" + imageUrl + "\"");
+}
+```
+
+### Configuración
+
+**application-local.properties:**
+```properties
+cloudinary.cloud-name=tu_cloud_name
+cloudinary.api-key=tu_api_key
+cloudinary.api-secret=tu_api_secret
+```
+
+**CloudinaryConfig.java:**
+```java
+@Configuration
+public class CloudinaryConfig {
+    @Value("${cloudinary.cloud-name}")
+    private String cloudName;
+    
+    @Value("${cloudinary.api-key}")
+    private String apiKey;
+    
+    @Value("${cloudinary.api-secret}")
+    private String apiSecret;
+    
+    @Bean
+    public Cloudinary cloudinary() {
+        return new Cloudinary(ObjectUtils.asMap(
+            "cloud_name", cloudName,
+            "api_key", apiKey,
+            "api_secret", apiSecret
+        ));
+    }
+}
+```
+
+### Estructura de URLs
+
+**Productos:**
+```
+https://res.cloudinary.com/{cloud_name}/image/upload/v{timestamp}/productos/{filename}.jpg
+```
 
 **Usuarios:**
 ```
-admin@duocuc.cl / admin123 (ADMIN)
-vendedor@duocuc.cl / vendedor123 (VENDEDOR)
-cliente@duocuc.cl / cliente123 (CLIENTE)
+https://res.cloudinary.com/{cloud_name}/image/upload/v{timestamp}/usuarios/{filename}.jpg
 ```
 
-**Categorías:**
-- Frutas frescas (FR)
-- Verduras orgánicas (VR)
-- Productos orgánicos (PO)
-- Productos lácteos (PL)
+### Seguridad
 
-**Productos:**
-- 10 productos con imágenes reales alojadas en Cloudinary
-- Todas las URLs de imágenes apuntan a `https://res.cloudinary.com/dg7dcbcjn/...`
+- ✅ Credenciales en `application-local.properties` (gitignored)
+- ✅ Frontend nunca conoce las credenciales
+- ✅ Todas las subidas pasan por backend
+- ⚠️ NUNCA commitear `application-local.properties`
 
-## Scripts Maven
+---
+
+## 🧪 Testing
+
+### Ejecutar Tests
 
 ```bash
-./mvnw clean install         # Compilar e instalar
-./mvnw spring-boot:run       # Ejecutar aplicación
+# Todos los tests
+./mvnw test
+
+# Con cobertura
+./mvnw clean test jacoco:report
+
+# Ver reporte
+open target/site/jacoco/index.html
 ```
 
-## Autores
+### Configuración de Tests
+
+**application.properties (test):**
+```properties
+# H2 In-Memory Database para tests
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driver-class-name=org.h2.Driver
+spring.jpa.hibernate.ddl-auto=create-drop
+
+# Cloudinary Mock (sin credenciales reales)
+cloudinary.cloud-name=test-cloud
+cloudinary.api-key=test-key
+cloudinary.api-secret=test-secret
+```
+
+### Tests Implementados
+
+- ✅ Tests unitarios de servicios
+- ✅ Tests de repositorios con H2
+- ✅ Tests de controladores con MockMvc
+- ✅ Validación de DTOs
+
+---
+
+## 📊 Datos de Prueba
+
+El script `bbdd.sql` incluye datos iniciales para testing:
+
+### Usuarios
+
+| Email | Password | Rol | Datos |
+|-------|----------|-----|-------|
+| `admin@duocuc.cl` | `admin123` | Admin | Super Administrador - ID: 1 |
+| `maria.gonzalez@duocuc.cl` | `admin456` | Admin | María José González - ID: 2 |
+| `carlos.torres@profesor.duoc.cl` | `admin789` | Admin | Carlos Eduardo Torres - ID: 3 |
+| `ana.martinez@duocuc.cl` | `cliente123` | Cliente | Ana María Martínez - ID: 4 ✨ |
+| `pedro.ramirez@duocuc.cl` | `cliente456` | Cliente | Pedro Antonio Ramírez - ID: 5 |
+| `lucia.fernandez@duocuc.cl` | `cliente789` | Cliente | Lucía Elena Fernández - ID: 6 |
+| *(y 13 usuarios más)* | - | Cliente | IDs: 7-19 |
+
+**✨ Usuario recomendado para testing:** Ana María (ID: 4)
+- ✅ Cliente VIP con foto de perfil
+- ✅ Tiene favoritos pre-cargados
+- ✅ Historial de órdenes
+
+### Productos
+
+**10 productos con imágenes reales en Cloudinary:**
+
+| ID | Nombre | Categoría | Precio | Stock | Imagen |
+|----|--------|-----------|--------|-------|--------|
+| 1 | FR001 - Manzanas Fuji | Frutas | $1,200 | 150 | ✅ Cloudinary |
+| 2 | FR002 - Naranjas Valencia | Frutas | $1,000 | 200 | ✅ Cloudinary |
+| 3 | FR003 - Plátanos Cavendish | Frutas | $800 | 250 | ✅ Cloudinary |
+| 4 | VR001 - Zanahorias Orgánicas | Verduras | $900 | 100 | ✅ Cloudinary |
+| 5 | VR002 - Espinacas Frescas | Verduras | $700 | 80 | ✅ Cloudinary |
+| 6 | VR003 - Pimentones Tricolores | Verduras | $1,500 | 120 | ✅ Cloudinary |
+| 7 | PO001 - Miel Orgánica | Orgánicos | $5,000 | 50 | ✅ Cloudinary |
+| 8 | PO002 - Quinua Orgánica | Orgánicos | $3,000 | 70 | ✅ Cloudinary |
+| 9 | PL001 - Leche Entera | Lácteos | $1,200 | 100 | ✅ Cloudinary |
+| 10 | PL002 - Queso de Cabra | Lácteos | $5,000 | 100 | ✅ Cloudinary |
+
+**Todas las imágenes apuntan a:** `https://res.cloudinary.com/dg7dcbcjn/image/upload/...`
+
+### Categorías
+
+1. **Frutas frescas** (FR)
+2. **Verduras orgánicas** (VR)
+3. **Productos orgánicos** (PO)
+4. **Productos lácteos** (PL)
+
+### Favoritos Pre-cargados
+
+- **Ana María** (ID 4): Manzanas, Miel, Queso, Pimentones
+- **Pedro** (ID 5): Naranjas, Zanahorias, Leche, Quinua
+- **Lucía** (ID 6): Plátanos, Espinacas, Manzanas, Leche
+- **Juan Carlos** (ID 10): Miel, Quinua, Espinacas, Naranjas
+- **Carla** (ID 11): Manzanas, Naranjas, Plátanos, Queso
+
+### Órdenes de Ejemplo
+
+- 20 órdenes históricas con snapshots
+- Estados variados (Enviado, Pendiente, Cancelado, Procesando)
+- Montos entre $5,400 y $38,000
+- Incluyen costo de envío variable (histórico)
+
+---
+
+## 🔧 Scripts Maven
+
+```bash
+# Limpiar proyecto
+./mvnw clean
+
+# Compilar sin tests
+./mvnw clean install -DskipTests
+
+# Compilar con tests
+./mvnw clean install
+
+# Solo tests
+./mvnw test
+
+# Ejecutar aplicación
+./mvnw spring-boot:run
+
+# Empaquetar JAR
+./mvnw package
+
+# Ver dependencias
+./mvnw dependency:tree
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Error: Cannot connect to MySQL
+
+```bash
+# Verificar que MySQL esté corriendo
+# Windows
+net start MySQL80
+
+# Linux/Mac
+sudo systemctl start mysql
+```
+
+### Error: Cloudinary credentials invalid
+
+```properties
+# Verificar application-local.properties existe
+# Copiar desde template
+cp src/main/resources/application-local.properties.template \
+   src/main/resources/application-local.properties
+
+# Editar con credenciales reales de Cloudinary
+```
+
+
+### Error: Base de datos no existe
+
+```sql
+-- Crear manualmente
+CREATE DATABASE hh_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Importar script
+mysql -u root -p hh_db < bbdd.sql
+```
+
+
+## 👥 Autores
 
 Desarrollado por:
-- [Sebastián Valdivia](https://github.com/ZalkiRyon)
-- [Paula Frías](https://github.com/paufriasest)
+- **Sebastián Valdivia** - [GitHub](https://github.com/ZalkiRyon)
+- **Paula Frías** - [GitHub](https://github.com/paufriasest)
+
+**Institución:** DUOC UC  
+**Año:** 2025  
+**Curso:** Desarrollo de Aplicaciones Móviles
+
+---
+
+## 🔗 Enlaces
+
+- **Backend Repository:** [Huerto_Hogar_Backend_Movil](https://github.com/ZalkiRyon/Huerto_Hogar_Backend_Movil)
+- **Frontend Repository:** [Huerto_Hogar_Frontend_Movil](https://github.com/ZalkiRyon/Huerto_Hogar_Frontend_Movil)
+
+---
+
+**Hecho usando Spring Boot y Java**
 
 ```
 ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠛⠛⠉⠙⠛⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
